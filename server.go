@@ -1,6 +1,6 @@
-package servers
+package logbuddy
 
 type Server interface {
     Listen()
-    Stop()
+    Close()
 }
