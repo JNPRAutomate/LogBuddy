@@ -13,25 +13,25 @@ type TCPServer struct {
 	Port       int
 	listenAddr *net.TCPAddr
 	ctrlChan   chan string
-	webChan    chan WebChanMsg
+	msgChan    chan Message
 	sock       *net.TCPListener
 }
 
 //NewTCPServer Creates a new initialized TCPServer
-func NewTCPServer(ctrlChan chan string, webChan chan WebChanMsg, net string, ip string, port int) *TCPServer {
-	s := &TCPServer{ctrlChan: ctrlChan, webChan: webChan, Type: net, IP: ip, Port: port}
+func NewTCPServer(ctrlChan chan string, msgChan chan Message, net string, ip string, port int) *TCPServer {
+	s := &TCPServer{ctrlChan: ctrlChan, msgChan: msgChan, Type: net, IP: ip, Port: port}
 	s.setListener()
 	return s
 }
 
 //Listen Starts TCPServer ready to receive messages
 // Typically run as a go routine
-func (s *TCPServer) Listen() {
+func (s *TCPServer) Listen() error {
 	var err error
 
 	s.sock, err = net.ListenTCP(s.Type, s.listenAddr)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	for {
 		conn, err := s.sock.AcceptTCP()
@@ -49,7 +49,7 @@ func (s *TCPServer) handleClient(conn *net.TCPConn) {
 		if ok := scanner.Scan(); !ok {
 			break
 		}
-		log.Println("TCP", scanner.Text())
+		s.msgChan <- Message{Type: DataMsg, Message: scanner.Bytes()}
 	}
 }
 

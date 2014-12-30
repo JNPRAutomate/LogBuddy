@@ -2,7 +2,6 @@ package logbuddy
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"net"
 )
@@ -13,26 +12,40 @@ type UDPServer struct {
 	IP         string
 	Port       int
 	listenAddr *net.UDPAddr
-	ctrlChan   chan string
-	webChan    chan WebChanMsg
+	ctrlChan   chan CtrlChanMsg
+	msgChan    chan Message
 	sock       *net.UDPConn
 }
 
 //NewUDPServer creates a new initialized UDP server
-func NewUDPServer(ctrlChan chan string, webChan chan WebChanMsg, ip string, port int, net string) *UDPServer {
-	s := &UDPServer{ctrlChan: ctrlChan, webChan: webChan, IP: ip, Port: port, Type: net, listenAddr: nil}
+func NewUDPServer(ctrlChan chan CtrlChanMsg, msgChan chan Message, ip string, port int, net string) *UDPServer {
+	s := &UDPServer{ctrlChan: ctrlChan, msgChan: msgChan, IP: ip, Port: port, Type: net, listenAddr: nil}
 	s.setListener()
 	return s
 }
 
 //Listen Listen to
-func (s *UDPServer) Listen() {
+func (s *UDPServer) Listen() error {
+
+	go func(s *UDPServer) {
+		for {
+			select {
+			case msg := <-s.ctrlChan:
+				if msg.Type == StopMsg {
+					log.Println("STOP")
+					s.stop()
+				}
+
+			}
+		}
+	}(s)
+
 	buffer := make([]byte, 9600)
 	var err error
 	s.sock, err = net.ListenUDP(s.Type, s.listenAddr)
 	s.sock.SetReadBuffer(MaxReadBuffer)
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 	for {
 		//handle each packet in a seperate go routine
@@ -42,11 +55,11 @@ func (s *UDPServer) Listen() {
 }
 
 func (s *UDPServer) handlePacket(buffer []byte) {
-	log.Println("UDP", len(buffer), string(buffer))
+	s.msgChan <- Message{Type: DataMsg, Message: buffer}
 }
 
 //Stop stops the UDP server from listening
-func (s *UDPServer) Stop() {
+func (s *UDPServer) stop() {
 	s.sock.Close()
 }
 
