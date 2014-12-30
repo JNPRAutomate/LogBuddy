@@ -8,18 +8,16 @@ import (
 
 //TCPServer A server to listen for TCP messages
 type TCPServer struct {
-	Type       string // tcp,tcp4,tcp6
-	IP         string
-	Port       int
+	Config     *ServerConfig
 	listenAddr *net.TCPAddr
-	ctrlChan   chan string
+	ctrlChan   chan CtrlChanMsg
 	msgChan    chan Message
 	sock       *net.TCPListener
 }
 
 //NewTCPServer Creates a new initialized TCPServer
-func NewTCPServer(ctrlChan chan string, msgChan chan Message, net string, ip string, port int) *TCPServer {
-	s := &TCPServer{ctrlChan: ctrlChan, msgChan: msgChan, Type: net, IP: ip, Port: port}
+func NewTCPServer(ctrlChan chan CtrlChanMsg, msgChan chan Message, config *ServerConfig) *TCPServer {
+	s := &TCPServer{ctrlChan: ctrlChan, msgChan: msgChan, Config: config}
 	s.setListener()
 	return s
 }
@@ -27,9 +25,22 @@ func NewTCPServer(ctrlChan chan string, msgChan chan Message, net string, ip str
 //Listen Starts TCPServer ready to receive messages
 // Typically run as a go routine
 func (s *TCPServer) Listen() error {
+	go func() {
+		for {
+			select {
+			case msg := <-s.ctrlChan:
+				if msg.Type == StopMsg {
+					log.Println("STOP")
+					s.close()
+				}
+
+			}
+		}
+	}()
+
 	var err error
 
-	s.sock, err = net.ListenTCP(s.Type, s.listenAddr)
+	s.sock, err = net.ListenTCP(s.Config.Type, s.listenAddr)
 	if err != nil {
 		return err
 	}
@@ -38,23 +49,21 @@ func (s *TCPServer) Listen() error {
 		if err != nil {
 			log.Println("TCP ERROR", err)
 		}
-		go s.handleClient(conn)
-	}
-}
-
-func (s *TCPServer) handleClient(conn *net.TCPConn) {
-	conn.SetReadBuffer(MaxReadBuffer)
-	scanner := bufio.NewScanner(conn)
-	for {
-		if ok := scanner.Scan(); !ok {
-			break
-		}
-		s.msgChan <- Message{Type: DataMsg, Message: scanner.Bytes()}
+		go func() {
+			conn.SetReadBuffer(MaxReadBuffer)
+			scanner := bufio.NewScanner(conn)
+			for {
+				if ok := scanner.Scan(); !ok {
+					break
+				}
+				s.msgChan <- Message{Type: DataMsg, Message: scanner.Bytes()}
+			}
+		}()
 	}
 }
 
 //Close Close the TCP Server
-func (s *TCPServer) Close() {
+func (s *TCPServer) close() {
 	if s.sock == nil {
 		return
 	}
@@ -62,6 +71,6 @@ func (s *TCPServer) Close() {
 }
 
 func (s *TCPServer) setListener() error {
-	s.listenAddr = &net.TCPAddr{IP: net.ParseIP(s.IP), Port: s.Port}
+	s.listenAddr = &net.TCPAddr{IP: net.ParseIP(s.Config.IP), Port: s.Config.Port}
 	return nil
 }

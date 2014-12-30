@@ -8,6 +8,11 @@ import (
 	"time"
 )
 
+//Test that UDP Server Matches Interface
+func TestUDPServerInterface(t *testing.T) {
+	var _ Server = (*UDPServer)(nil)
+}
+
 func TestBasicUDPListener(t *testing.T) {
 	var counter int
 	counter = 0
@@ -24,7 +29,8 @@ func TestBasicUDPListener(t *testing.T) {
 		}
 	}(msgChan)
 
-	listener := &UDPServer{ctrlChan: ctrlChan, msgChan: msgChan, Type: "udp4", IP: "0.0.0.0", Port: 5000, listenAddr: &net.UDPAddr{IP: net.ParseIP("0.0.0.0"), Port: 5000}}
+	listener := &UDPServer{ctrlChan: ctrlChan, msgChan: msgChan, Config: &ServerConfig{IP: "0.0.0.0", Port: 5000, Type: "udp4"}}
+	listener.setListener()
 	go listener.Listen()
 	time.Sleep(1 * time.Second)
 	for {

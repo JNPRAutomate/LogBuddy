@@ -8,11 +8,17 @@ import (
 	"time"
 )
 
+//Test that TCP Server Matches Interface
+func TestTCPServerInterface(t *testing.T) {
+	var _ Server = (*TCPServer)(nil)
+}
+
 func TestBasicTCPListener(t *testing.T) {
 	var counter int
 	counter = 0
 
 	msgChan := make(chan Message)
+	ctrlChan := make(chan CtrlChanMsg)
 
 	go func(msgChan chan Message) {
 		for {
@@ -23,7 +29,7 @@ func TestBasicTCPListener(t *testing.T) {
 		}
 	}(msgChan)
 
-	listener := &TCPServer{Type: "tcp4", IP: "0.0.0.0", Port: 5000, msgChan: msgChan}
+	listener := &TCPServer{Config: &ServerConfig{IP: "0.0.0.0", Port: 5000, Type: "tcp4"}, msgChan: msgChan, ctrlChan: ctrlChan}
 	listener.setListener()
 	go listener.Listen()
 	time.Sleep(1 * time.Second)
@@ -49,6 +55,7 @@ func TestBasicTCPListener(t *testing.T) {
 		testConn.Close()
 		time.Sleep(1 * time.Second)
 		if counter == 10 {
+			ctrlChan <- CtrlChanMsg{Type: StopMsg}
 			break
 		}
 	}
