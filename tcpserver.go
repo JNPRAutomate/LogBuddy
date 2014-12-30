@@ -2,8 +2,10 @@ package logbuddy
 
 import (
 	"bufio"
+	"io"
 	"log"
 	"net"
+	"time"
 )
 
 //TCPServer A server to listen for TCP messages
@@ -13,6 +15,7 @@ type TCPServer struct {
 	ctrlChan   chan CtrlChanMsg
 	msgChan    chan Message
 	sock       *net.TCPListener
+	conns      []*net.TCPConn
 }
 
 //NewTCPServer Creates a new initialized TCPServer
@@ -30,10 +33,10 @@ func (s *TCPServer) Listen() error {
 			select {
 			case msg := <-s.ctrlChan:
 				if msg.Type == StopMsg {
-					log.Println("STOP")
+					log.Println("Stopping UDP Server")
 					s.close()
+					return
 				}
-
 			}
 		}
 	}()
@@ -47,14 +50,30 @@ func (s *TCPServer) Listen() error {
 	for {
 		conn, err := s.sock.AcceptTCP()
 		if err != nil {
-			log.Println("TCP ERROR", err)
+			switch err := err.(type) {
+			case net.Error:
+				if err.Timeout() {
+					log.Println("Timeout Error")
+				} else if err.Temporary() {
+					log.Println("Temp Error")
+				}
+			}
+			return err
 		}
+		conn.SetReadBuffer(MaxReadBuffer)
+		s.conns = append(s.conns, conn)
+		scanner := bufio.NewScanner(conn)
 		go func() {
-			conn.SetReadBuffer(MaxReadBuffer)
-			scanner := bufio.NewScanner(conn)
 			for {
 				if ok := scanner.Scan(); !ok {
-					break
+					conn.SetReadDeadline(time.Now())
+					if _, err := conn.Read(make([]byte, 1)); err == io.EOF {
+						conn.Close()
+						conn = nil
+					} else {
+						conn.SetReadDeadline(time.Time{})
+					}
+					return
 				}
 				s.msgChan <- Message{Type: DataMsg, Message: scanner.Bytes()}
 			}
@@ -66,6 +85,18 @@ func (s *TCPServer) Listen() error {
 func (s *TCPServer) close() {
 	if s.sock == nil {
 		return
+	}
+	for item := range s.conns {
+		if s.conns[item] != nil {
+			s.conns[item].SetReadDeadline(time.Now())
+			if _, err := s.conns[item].Read(make([]byte, 1)); err == io.EOF {
+				s.conns[item].Close()
+				s.conns[item] = nil
+			} else {
+				s.conns[item].SetReadDeadline(time.Time{})
+			}
+		}
+
 	}
 	s.sock.Close()
 }

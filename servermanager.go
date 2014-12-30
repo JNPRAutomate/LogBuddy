@@ -10,10 +10,15 @@ type ServerManager struct {
 	CtrlChans map[int]chan CtrlChanMsg
 }
 
+//NewServerManager Creates a new server manager with an initalized CtrlChans map
+func NewServerManager() *ServerManager {
+	return &ServerManager{CtrlChans: make(map[int]chan CtrlChanMsg)}
+}
+
 //StartServer Start a new server with a server config
 func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 	//set default id to 0
-	id = 0
+	id = s.getID()
 
 	if config.Type == "tcp4" || config.Type == "tcp6" || config.Type == "tcp" {
 		msgChan := make(chan Message)
@@ -40,7 +45,6 @@ func (s *ServerManager) StopServer(id int) error {
 	if _, ok := s.CtrlChans[id]; ok {
 		s.CtrlChans[id] <- CtrlChanMsg{Type: StopMsg}
 	}
-
 	return nil
 }
 
@@ -48,7 +52,7 @@ func (s *ServerManager) getID() (id int) {
 	rand.Seed(time.Now().Unix() * rand.Int63())
 	id = rand.Int()
 
-	if _, ok := s.CtrlChans[id]; ok {
+	if _, ok := s.CtrlChans[id]; !ok {
 		return id
 	}
 	return s.getID()

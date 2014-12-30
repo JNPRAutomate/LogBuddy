@@ -6,6 +6,8 @@ import (
 	"net"
 )
 
+var UDPTestPort = 5000
+
 //UDPServer A server to listen for UDP messages
 type UDPServer struct {
 	Config     *ServerConfig
@@ -25,18 +27,19 @@ func NewUDPServer(ctrlChan chan CtrlChanMsg, msgChan chan Message, config *Serve
 //Listen Listen to
 func (s *UDPServer) Listen() error {
 
-	go func(s *UDPServer) {
+	go func() {
 		for {
 			select {
 			case msg := <-s.ctrlChan:
 				if msg.Type == StopMsg {
-					log.Println("STOP")
+					log.Println("Stopping UDP Server")
 					s.close()
+					return
 				}
 
 			}
 		}
-	}(s)
+	}()
 
 	buffer := make([]byte, 9600)
 	var err error
@@ -47,7 +50,10 @@ func (s *UDPServer) Listen() error {
 	}
 	for {
 		//handle each packet in a seperate go routine
-		s.sock.ReadFromUDP(buffer)
+		_, _, err := s.sock.ReadFromUDP(buffer)
+		if err != nil {
+			log.Println(err)
+		}
 		go func() {
 			s.msgChan <- Message{Type: DataMsg, Message: bytes.Trim(buffer, "\x00")}
 		}()
