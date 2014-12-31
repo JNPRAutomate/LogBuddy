@@ -26,6 +26,8 @@ func NewUDPServer(ctrlChan chan CtrlChanMsg, msgChan chan Message, config *Serve
 
 //Listen Listen to
 func (s *UDPServer) Listen() error {
+	var err error
+	buffer := make([]byte, 9600)
 
 	go func() {
 		for {
@@ -36,13 +38,10 @@ func (s *UDPServer) Listen() error {
 					s.close()
 					return
 				}
-
 			}
 		}
 	}()
 
-	buffer := make([]byte, 9600)
-	var err error
 	s.sock, err = net.ListenUDP(s.Config.Type, s.listenAddr)
 	s.sock.SetReadBuffer(MaxReadBuffer)
 	if err != nil {
@@ -52,7 +51,15 @@ func (s *UDPServer) Listen() error {
 		//handle each packet in a seperate go routine
 		_, _, err := s.sock.ReadFromUDP(buffer)
 		if err != nil {
-			log.Println(err)
+			switch err := err.(type) {
+			case net.Error:
+				if err.Timeout() {
+					log.Println("Timeout Error")
+				} else if err.Temporary() {
+					log.Println("Temp Error")
+				}
+			}
+			return err
 		}
 		go func() {
 			s.msgChan <- Message{Type: DataMsg, Message: bytes.Trim(buffer, "\x00")}

@@ -28,20 +28,20 @@ func NewTCPServer(ctrlChan chan CtrlChanMsg, msgChan chan Message, config *Serve
 //Listen Starts TCPServer ready to receive messages
 // Typically run as a go routine
 func (s *TCPServer) Listen() error {
+	var err error
+
 	go func() {
 		for {
 			select {
 			case msg := <-s.ctrlChan:
 				if msg.Type == StopMsg {
-					log.Println("Stopping UDP Server")
+					log.Println("Stopping TCP Server")
 					s.close()
 					return
 				}
 			}
 		}
 	}()
-
-	var err error
 
 	s.sock, err = net.ListenTCP(s.Config.Type, s.listenAddr)
 	if err != nil {
