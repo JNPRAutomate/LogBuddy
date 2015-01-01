@@ -9,11 +9,14 @@ import (
 type ServerManager struct {
 	CtrlChans map[int]chan CtrlChanMsg
 	MsgChans  map[int]chan Message
+	msgRouter *MsgRouter
 }
 
 //NewServerManager Creates a new server manager with an initalized CtrlChans map
 func NewServerManager() *ServerManager {
-	return &ServerManager{CtrlChans: make(map[int]chan CtrlChanMsg)}
+	return &ServerManager{CtrlChans: make(map[int]chan CtrlChanMsg),
+		MsgChans:  make(map[int]chan Message),
+		msgRouter: &MsgRouter{}}
 }
 
 //StartServer Start a new server with a server config

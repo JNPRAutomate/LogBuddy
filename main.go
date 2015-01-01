@@ -1,10 +1,17 @@
 package logbuddy
 
 const (
-	MaxReadBuffer = 1048576 //MaxReadBuffer Max mempory allocated to a server socket for listening
-	//Control Channel Message
-	InitMsg  = 0
-	DataMsg  = 1
+	//MaxReadBuffer Max mempory allocated to a server socket for listening
+	MaxReadBuffer = 1048576
+
+	//Control message types
+
+	//InitMsg Initialization message
+	InitMsg = 0
+	//DataMsg Data message
+	DataMsg = 1
+	//StartMsg Start message
 	StartMsg = 100
-	StopMsg  = 255
+	//StopMsg Stop message
+	StopMsg = 255
 )
