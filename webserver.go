@@ -85,8 +85,10 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 		conn.SetReadDeadline(time.Now().Add(pongKeepAlive))
 		return nil
 	})
+	//Send WebSocket PING messages
 	go func(conn *websocket.Conn) {
 		pingTicker := time.NewTicker(pingRate)
+		msgTicker := time.NewTicker(1 * time.Second)
 		for {
 			select {
 			case <-pingTicker.C:
@@ -95,44 +97,52 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 				if err := conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
 					return
 				}
+			case <-msgTicker.C:
+				log.Println("TESTMSG")
+				conn.SetWriteDeadline(time.Now().Add(writeWait))
+				if err := conn.WriteMessage(websocket.TextMessage, []byte("TESTMSG")); err != nil {
+					return
+				}
 			}
 		}
 	}(conn)
-	for {
-		msgType, data, err := conn.ReadMessage()
-		log.Println("MsgType", msgType)
-		if err != nil {
-			log.Println(err)
-			conn.Close()
-			return
+	go func(conn *websocket.Conn) {
+		for {
+			msgType, data, err := conn.ReadMessage()
+			log.Println("MsgType", msgType)
+			if err != nil {
+				log.Println(err)
+				conn.Close()
+				return
+			}
+			//Handle various messages
+			switch msgType {
+			//Handle text messages
+			case websocket.TextMessage:
+				//handle json requests
+				log.Println("Text")
+				log.Println(string(data))
+				//handle msg resistrations
+			//Handle binary messages
+			case websocket.BinaryMessage:
+				//currently not used
+				log.Println("Bin")
+			//Handle close messages
+			case websocket.CloseMessage:
+				//Closing connection
+				conn.Close()
+				break
+			}
 		}
-		switch msgType {
-		case websocket.BinaryMessage:
-			//currently not implemented
-			log.Println("Bin")
-			break
-		case websocket.TextMessage:
-			//handle json requests
-			log.Println("Text")
-			log.Println(string(data))
-		case websocket.CloseMessage:
-			conn.Close()
-			break
-		case websocket.PingMessage:
-			break
-		case websocket.PongMessage:
-			break
-		default:
-			log.Println("READ")
-		}
-	}
+	}(conn)
 }
 
+//wsOriginChecker Checks the origin request and validates the request
 func (ws *WebServer) wsOriginChecker(r *http.Request) bool {
-	log.Println("ORIGN")
 	return true
 }
 
+//wsError Handles errors for WebSocket connections
 func (ws *WebServer) wsError(w http.ResponseWriter, r *http.Request, status int, reason error) {
 	log.Println(status, reason)
 }
