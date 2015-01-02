@@ -1,15 +1,21 @@
 package logbuddy
 
 import (
+	"fmt"
 	"net"
 )
 
+//Message struct used to pass logging information
 type Message struct {
-	Type     int    //Msg type
-	Message  []byte //message
-	SrcIP    net.IP //Src IP of message
-	SrcPort  int    //Src Port of message
-	DestIP   net.IP //Dst IP of message
-	DestPort int    //Dest Port of message
-	Network  string //Network type of message tcp,tcp4,tcp6,udp,udp4,udp6
+	Type    int    `json:"type"`     //Msg type
+	Message []byte `json:"messag"`   //message
+	SrcIP   net.IP `json:"srcip"`    //Src IP of message
+	SrcPort int    `json:"srcport"`  //Src Port of message
+	DstIP   net.IP `json:"destip"`   //Dst IP of message
+	DstPort int    `json:"destport"` //Dest Port of message
+	Network string `json:"network"`  //Network type of message tcp,tcp4,tcp6,udp,udp4,udp6
+}
+
+func (m *Message) String() string {
+	return fmt.Sprintf("Type=\"%d\" SrcIP=\"%s\" SrcPort=\"%d\" DstIP=\"%s\" DstPort=\"%d\" Network=\"%s\" Message=\"%s\"", m.Type, m.SrcIP.String(), m.SrcPort, m.DstIP.String(), m.DstPort, m.Network, string(m.Message))
 }

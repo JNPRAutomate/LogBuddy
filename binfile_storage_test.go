@@ -8,15 +8,15 @@ import (
 	"testing"
 )
 
-func TestFileStorage(t *testing.T) {
+func TestBinFileStorage(t *testing.T) {
 	var err error
 	var fileURL *url.URL
 	wd, _ := os.Getwd()
-	fileURL, err = url.Parse(strings.Join([]string{"file://", wd, "/test/test.txt"}, ""))
+	fileURL, err = url.Parse(strings.Join([]string{"file://", wd, "/test/TestBinFileStorage.bin"}, ""))
 	if err != nil {
 		t.Fatalf("%s", err.Error())
 	}
-	fs := &FileStorage{Location: fileURL}
+	fs := &BinFileStorage{Location: fileURL}
 	err = fs.Open()
 	if err != nil {
 		t.Fatalf("%s", err.Error())

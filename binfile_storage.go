@@ -2,29 +2,29 @@ package logbuddy
 
 import (
 	"bufio"
+	"encoding/gob"
 	"net/url"
 	"os"
-	"strings"
 )
 
-//FileStorage Allows data to be written to a file
-type FileStorage struct {
+//BinFileStorage Store logs in a binary format
+type BinFileStorage struct {
 	Location *url.URL     //location of the storage file
 	MsgChan  chan Message //Channel to recieve messages from
 	LogFile  *os.File     //File the file being used
 }
 
-//NewFileStorage Create an initialized NewFileStorage
-func NewFileStorage(loc *url.URL) *FileStorage {
-	return &FileStorage{Location: loc}
+//NewBinFileStorage Create an initialized NewBinFileStorage
+func NewBinFileStorage(loc *url.URL) *BinFileStorage {
+	return &BinFileStorage{Location: loc}
 }
 
 //Write Write data to the destination file
-func (s *FileStorage) Write(data ...Message) error {
+func (s *BinFileStorage) Write(data ...Message) error {
 	w := bufio.NewWriter(s.LogFile)
-
+	e := gob.NewEncoder(w)
 	for msg := range data {
-		_, err := w.WriteString(strings.Join([]string{data[msg].String(), string('\n')}, ""))
+		err := e.Encode(data[msg])
 		if err != nil {
 			return err
 		}
@@ -39,12 +39,12 @@ func (s *FileStorage) Write(data ...Message) error {
 }
 
 //Read Reads data from the
-func (s *FileStorage) Read(data ...[]byte) error {
+func (s *BinFileStorage) Read(data ...[]byte) error {
 	return nil
 }
 
 //Open Open the file for writing
-func (s *FileStorage) Open() error {
+func (s *BinFileStorage) Open() error {
 	var err error
 	if _, err = os.Stat(s.Location.Path); os.IsNotExist(err) {
 		s.LogFile, err = os.Create(s.Location.Path)
@@ -61,12 +61,12 @@ func (s *FileStorage) Open() error {
 }
 
 //Close Close the file for writing
-func (s *FileStorage) Close() error {
+func (s *BinFileStorage) Close() error {
 	err := s.LogFile.Close()
 	return err
 }
 
 //SetDest Set the destination URL for writing
-func (s *FileStorage) SetDest(dest string) error {
+func (s *BinFileStorage) SetDest(dest string) error {
 	return nil
 }
