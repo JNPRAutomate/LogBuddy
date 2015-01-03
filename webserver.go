@@ -43,6 +43,13 @@ func (ws *WebServer) Close() error {
 	//stop all connections
 	//stop all open websocket connections
 	//stop server from listening
+	for item := range ws.wsConns {
+		if ws.wsConns[item] != nil {
+			ws.wsConns[item].SetReadDeadline(time.Now())
+			ws.wsConns[item].Close()
+		}
+
+	}
 	return nil
 }
 

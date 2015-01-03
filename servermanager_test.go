@@ -12,7 +12,7 @@ func TestServerManager(t *testing.T) {
 
 	counter := 0
 	//create new server manager
-	sm := &ServerManager{CtrlChans: make(map[int]chan CtrlChanMsg), MsgChans: make(map[int]chan Message)}
+	sm := &ServerManager{CtrlChans: make(map[int]chan CtrlChanMsg), MsgChans: make(map[int]chan Message), ServerConfigs: make(map[int]*ServerConfig)}
 	//start tcp server
 	tcpServerID, err := sm.StartServer(&ServerConfig{IP: "0.0.0.0", Port: ServerManagerTestPort, Type: "tcp4"})
 	log.Println("Starting TCP Server ID", tcpServerID)

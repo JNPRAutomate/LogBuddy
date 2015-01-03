@@ -11,8 +11,13 @@ import (
 func TestFileStorage(t *testing.T) {
 	var err error
 	var fileURL *url.URL
+	//Create test directory
+	err = os.Mkdir("_test", 0777)
+	if err != nil {
+		t.Fatalf("%s", err.Error())
+	}
 	wd, _ := os.Getwd()
-	fileURL, err = url.Parse(strings.Join([]string{"file://", wd, "/test/test.txt"}, ""))
+	fileURL, err = url.Parse(strings.Join([]string{"file://", wd, "/_test/test.txt"}, ""))
 	if err != nil {
 		t.Fatalf("%s", err.Error())
 	}
@@ -27,9 +32,14 @@ func TestFileStorage(t *testing.T) {
 	for i = 0; i < 100; i++ {
 		err = fs.Write(Message{Type: DataMsg, Network: "udp4", SrcIP: net.ParseIP("1.1.1.1"), DstIP: net.ParseIP("2.2.2.2"), DstPort: 5000, SrcPort: 5000, Message: []byte("Eat the test")})
 		if err != nil {
-			t.Fatalf("%s", err)
+			t.Fatalf("%s", err.Error())
 		}
 	}
 	t.Log("Write to file")
 	fs.Close()
+	//Remove test files
+	err = os.RemoveAll("./_test")
+	if err != nil {
+		t.Fatalf("%s", err.Error())
+	}
 }

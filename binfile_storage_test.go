@@ -11,8 +11,13 @@ import (
 func TestBinFileStorage(t *testing.T) {
 	var err error
 	var fileURL *url.URL
+	//Create test directory
+	err = os.Mkdir("_test", 0777)
+	if err != nil {
+		t.Fatalf("%s", err.Error())
+	}
 	wd, _ := os.Getwd()
-	fileURL, err = url.Parse(strings.Join([]string{"file://", wd, "/test/TestBinFileStorage.bin"}, ""))
+	fileURL, err = url.Parse(strings.Join([]string{"file://", wd, "/_test/TestBinFileStorage.bin"}, ""))
 	if err != nil {
 		t.Fatalf("%s", err.Error())
 	}
@@ -32,4 +37,8 @@ func TestBinFileStorage(t *testing.T) {
 	}
 	t.Log("Write to file")
 	fs.Close()
+	err = os.RemoveAll("./_test")
+	if err != nil {
+		t.Fatalf("%s", err.Error())
+	}
 }
