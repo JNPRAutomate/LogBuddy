@@ -19,3 +19,9 @@ type Message struct {
 func (m *Message) String() string {
 	return fmt.Sprintf("Type=\"%d\" SrcIP=\"%s\" SrcPort=\"%d\" DstIP=\"%s\" DstPort=\"%d\" Network=\"%s\" Message=\"%s\"", m.Type, m.SrcIP.String(), m.SrcPort, m.DstIP.String(), m.DstPort, m.Network, string(m.Message))
 }
+
+//ClientMessage Messages sent from the websocket client
+type ClientMessage struct {
+	Type    int //Type message type
+	Channel int // channel to listen on
+}

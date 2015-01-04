@@ -1,6 +1,7 @@
 package logbuddy
 
 import (
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"log"
@@ -23,7 +24,6 @@ var (
 type WebServer struct {
 	listener  net.Listener      //TCP listener
 	Address   string            //Address the address to listen on
-	Router    *mux.Router       //Router for handling requests
 	ServerMgr *ServerManager    //ServerMgr Interaction with the server manager to review jobs
 	wsConns   []*websocket.Conn //Conns all open connection
 }
@@ -105,7 +105,6 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 	//Send WebSocket PING messages
 	go func(conn *websocket.Conn) {
 		pingTicker := time.NewTicker(pingRate)
-		msgTicker := time.NewTicker(1 * time.Second)
 		for {
 			select {
 			case <-pingTicker.C:
@@ -114,15 +113,10 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 				if err := conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
 					return
 				}
-			case <-msgTicker.C:
-				log.Println("TESTMSG")
-				conn.SetWriteDeadline(time.Now().Add(writeWait))
-				if err := conn.WriteMessage(websocket.TextMessage, []byte("TESTMSG")); err != nil {
-					return
-				}
 			}
 		}
 	}(conn)
+	//Recieve WebSocket Messages
 	go func(conn *websocket.Conn) {
 		for {
 			msgType, data, err := conn.ReadMessage()
@@ -139,7 +133,35 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 				//handle json requests
 				log.Println("Text")
 				log.Println(string(data))
-				//handle msg resistrations
+				//handle different message requests here
+				cm := &ClientMessage{}
+				if err := json.Unmarshal(data, cm); err != nil {
+					//error in decoding JSON
+					conn.SetWriteDeadline(time.Now().Add(writeWait))
+					if err := conn.WriteMessage(websocket.TextMessage, []byte("JSON Error")); err != nil {
+						return
+					}
+				}
+				//process message
+				logChan, err := ws.RegisterLogger(cm.Channel)
+				if err != nil {
+					//channel not found
+					conn.SetWriteDeadline(time.Now().Add(writeWait))
+					if err := conn.WriteMessage(websocket.TextMessage, []byte("NOT FOUND")); err != nil {
+						return
+					}
+				}
+				go func() {
+					for {
+						select {
+						case m := <-logChan:
+							conn.SetWriteDeadline(time.Now().Add(writeWait))
+							if err := conn.WriteMessage(websocket.TextMessage, m.Message); err != nil {
+								return
+							}
+						}
+					}
+				}()
 			//Handle binary messages
 			case websocket.BinaryMessage:
 				//currently not used
@@ -162,6 +184,11 @@ func (ws *WebServer) wsOriginChecker(r *http.Request) bool {
 //wsError Handles errors for WebSocket connections
 func (ws *WebServer) wsError(w http.ResponseWriter, r *http.Request, status int, reason error) {
 	log.Println(status, reason)
+}
+
+//RegisterLogger Registers a logger to be sent to the connection
+func (ws *WebServer) RegisterLogger(id int) (msgChan chan Message, err error) {
+	return nil, nil
 }
 
 const homeHTML = `<!DOCTYPE html>
