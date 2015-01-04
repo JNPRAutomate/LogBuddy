@@ -1,7 +1,6 @@
 package logbuddy
 
 import (
-	"log"
 	"net"
 	"strconv"
 	"testing"
@@ -25,7 +24,7 @@ func TestBasicTCPListener(t *testing.T) {
 		for {
 			select {
 			case msg := <-msgChan:
-				log.Println(string(msg.Message))
+				t.Logf("%s", string(msg.Message))
 			}
 		}
 	}(msgChan)
@@ -46,10 +45,10 @@ func TestBasicTCPListener(t *testing.T) {
 }
 
 func SendTCPMessage(dstIP string, dstPort int, netType string, itter int, counter int, t *testing.T) {
-	log.Println("Starting TCP connection:", counter)
+	t.Logf("%s %d", "Starting TCP connection:", counter)
 	testConn, err := net.DialTCP(netType, nil, &net.TCPAddr{IP: net.ParseIP(dstIP), Port: dstPort})
 	if err != nil {
-		log.Println("TCP Client Error: ", err)
+		t.Logf("%s %s", "TCP Client Error: ", err)
 		t.Fail()
 	} else {
 		var i int
@@ -57,11 +56,11 @@ func SendTCPMessage(dstIP string, dstPort int, netType string, itter int, counte
 			msg := "Hello " + strconv.Itoa(counter) + "\n"
 			_, err := testConn.Write([]byte(msg))
 			if err != nil {
-				log.Println("TCP Write Error: ", err)
+				t.Logf("%s %s", "TCP Write Error: ", err)
 				t.Fail()
 			}
 		}
 	}
-	log.Println("Stopping TCP connection:", counter)
+	t.Logf("%s %d", "Stopping TCP connection:", counter)
 	testConn.Close()
 }

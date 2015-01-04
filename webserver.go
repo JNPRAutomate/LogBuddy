@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"log"
+	"net"
 	"net/http"
 	"text/template"
 	"time"
@@ -20,6 +21,7 @@ var (
 
 //WebServer Serves the user front end and APIs
 type WebServer struct {
+	listener  net.Listener      //TCP listener
 	Address   string            //Address the address to listen on
 	Router    *mux.Router       //Router for handling requests
 	ServerMgr *ServerManager    //ServerMgr Interaction with the server manager to review jobs
@@ -28,11 +30,19 @@ type WebServer struct {
 
 //Listen set webserver to listen
 func (ws *WebServer) Listen() error {
+	var err error
 	r := mux.NewRouter()
 	r.HandleFunc("/", ws.homeHandler)
 	r.HandleFunc("/logs", ws.wsServeLogs)
-	http.Handle("/", r)
-	if err := http.ListenAndServe(ws.Address, nil); err != nil {
+	addr, err := net.ResolveTCPAddr("tcp", ws.Address)
+	if err != nil {
+		return err
+	}
+	ws.listener, err = net.ListenTCP("tcp", addr)
+	if err != nil {
+		return err
+	}
+	if err = http.Serve(ws.listener, r); err != nil {
 		return err
 	}
 	return nil
@@ -50,7 +60,7 @@ func (ws *WebServer) Close() error {
 		}
 
 	}
-	return nil
+	return ws.listener.Close()
 }
 
 func (ws *WebServer) homeHandler(w http.ResponseWriter, r *http.Request) {

@@ -12,6 +12,7 @@ func TestBasicWebServer(t *testing.T) {
 	testServer := "localhost:8080"
 	ws := &WebServer{Address: testServer}
 	go ws.Listen()
+	defer ws.Close()
 	time.Sleep(1 * time.Second)
 	res, err := http.Get("http://localhost:8080/")
 	if err != nil {
@@ -23,11 +24,10 @@ func TestBasicWebServer(t *testing.T) {
 	}
 	t.Log("Data Bytes Recieved:", len(data))
 	res.Body.Close()
-	ws.Close()
 }
 
 func TestBasicWebSocketServer(t *testing.T) {
-	testServer := "localhost:8080"
+	testServer := "localhost:8081"
 	ws := &WebServer{Address: testServer}
 	go ws.Listen()
 	time.Sleep(1 * time.Second)
@@ -35,10 +35,10 @@ func TestBasicWebSocketServer(t *testing.T) {
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024}
 	clientHeader := http.Header{}
-	clientHeader.Add("Origin", "http://localhost:8080")
+	clientHeader.Add("Origin", "http://localhost:8081")
 	clientHeader.Add("Host", testServer)
 	clientHeader.Add("Sec-WebSocket-Extensions", "permessage-deflate; client_max_window_bits")
-	cConn, _, err := wsClient.Dial("ws://localhost:8080/logs", clientHeader)
+	cConn, _, err := wsClient.Dial("ws://localhost:8081/logs", clientHeader)
 	if err != nil {
 		t.Fatalf("%s", err.Error())
 	}
@@ -47,5 +47,4 @@ func TestBasicWebSocketServer(t *testing.T) {
 		t.Fatalf("%s", err.Error())
 	}
 	cConn.Close()
-	ws.Close()
 }

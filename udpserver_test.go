@@ -1,7 +1,6 @@
 package logbuddy
 
 import (
-	"log"
 	"net"
 	"strconv"
 	"testing"
@@ -25,7 +24,7 @@ func TestBasicUDPListener(t *testing.T) {
 		for {
 			select {
 			case msg := <-msgChan:
-				log.Println(string(msg.Message))
+				t.Logf("%s", string(msg.Message))
 			}
 		}
 	}(msgChan)
@@ -46,16 +45,16 @@ func TestBasicUDPListener(t *testing.T) {
 }
 
 func SendUDPMessage(dstIP string, dstPort int, netType string, itter int, counter int, t *testing.T) {
-	log.Println("Starting UDP connection:", counter)
+	t.Logf("%s %d", "Starting UDP connection:", counter)
 	testConn, _ := net.DialUDP(netType, nil, &net.UDPAddr{IP: net.ParseIP(dstIP), Port: dstPort})
 	var i int
 	for i = 0; i < itter; i++ {
 		_, err := testConn.Write([]byte("Hello " + strconv.Itoa(counter)))
 		if err != nil {
-			log.Println("UDP Write Error: ", err)
+			t.Logf("%s %s", "UDP Write Error: ", err)
 			t.Fail()
 		}
 	}
-	log.Println("Stopping UDP connection:", counter)
+	t.Logf("%s %d", "Stopping UDP connection:", counter)
 	testConn.Close()
 }
