@@ -8,7 +8,7 @@ import (
 //Message struct used to pass logging information
 type Message struct {
 	Type    int    `json:"type"`     //Msg type
-	Message []byte `json:"messag"`   //message
+	Message []byte `json:"message"`  //message
 	SrcIP   net.IP `json:"srcip"`    //Src IP of message
 	SrcPort int    `json:"srcport"`  //Src Port of message
 	DstIP   net.IP `json:"destip"`   //Dst IP of message

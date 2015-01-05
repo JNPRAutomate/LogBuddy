@@ -11,5 +11,5 @@ type Server interface {
 type ServerConfig struct {
 	Type string // udp,udp4,udp6,tcp,tcp4,tcp6
 	IP   string // IP Address in string format
-	Port int
+	Port int    // Port to listen in, < 1024 requires root permission
 }
