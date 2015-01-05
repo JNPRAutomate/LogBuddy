@@ -1,3 +1,8 @@
+App Usage
+===========
+
+Pending inital release.
+
 WebSocket API
 =============
 
