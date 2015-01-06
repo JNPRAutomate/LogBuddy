@@ -32,8 +32,11 @@ type WebServer struct {
 func (ws *WebServer) Listen() error {
 	var err error
 	r := mux.NewRouter()
-	r.HandleFunc("/", ws.homeHandler)
+	ws.ServerMgr = NewServerManager()
+	r.HandleFunc("/", ws.homeHandler).Methods("GET")
 	r.HandleFunc("/logs", ws.wsServeLogs)
+	//r.HandleFunc("/js/d3.js", jsD3Handler).Methods("GET")
+	//r.HandleFunc("/js/jquery.js", jsJQueryHandler).Methods("GET")
 	addr, err := net.ResolveTCPAddr("tcp", ws.Address)
 	if err != nil {
 		return err
@@ -142,7 +145,9 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 						return
 					}
 				}
+				log.Printf("%#v", cm)
 				//process message
+				ws.ServerMgr.StartServer(&cm.ServerConfig)
 				logChan, err := ws.RegisterLogger(cm.Channel)
 				if err != nil {
 					//channel not found

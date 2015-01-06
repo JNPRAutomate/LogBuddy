@@ -10,8 +10,12 @@ const (
 	InitMsg = 0
 	//DataMsg Data message
 	DataMsg = 1
+	//ReqMsg New request message
+	ReqMsg = 2
 	//StartMsg Start message
 	StartMsg = 100
+	//AckStartMsg acknowledge start message
+	AckStartMsg = 101
 	//StopMsg Stop message
 	StopMsg = 255
 )

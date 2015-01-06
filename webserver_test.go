@@ -11,7 +11,7 @@ import (
 func TestBasicWebServer(t *testing.T) {
 	testServer := "localhost:8080"
 	ws := &WebServer{Address: testServer}
-	go ws.Listen()
+	ws.Listen()
 	defer ws.Close()
 	time.Sleep(1 * time.Second)
 	res, err := http.Get("http://localhost:8080/")

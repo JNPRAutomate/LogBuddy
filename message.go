@@ -22,6 +22,7 @@ func (m *Message) String() string {
 
 //ClientMessage Messages sent from the websocket client
 type ClientMessage struct {
-	Type    int //Type message type
-	Channel int // channel to listen on
+	Type         int          `json:"type"`         //Type message type
+	Channel      int          `json:"channel"`      // channel to listen on
+	ServerConfig ServerConfig `json:"serverconfig"` //ServerConfig configuration of requested server
 }
