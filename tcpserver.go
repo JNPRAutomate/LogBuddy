@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"strconv"
 	"time"
 )
 
@@ -75,7 +76,23 @@ func (s *TCPServer) Listen() error {
 					}
 					return
 				}
-				s.msgChan <- Message{Type: DataMsg, Message: scanner.Bytes()}
+				srcIP, srcPort, err := net.SplitHostPort(conn.RemoteAddr().String())
+				if err != nil {
+					break
+				}
+				dstIP, dstPort, err := net.SplitHostPort(conn.LocalAddr().String())
+				if err != nil {
+					break
+				}
+				srcPortInt, err := strconv.Atoi(srcPort)
+				if err != nil {
+					break
+				}
+				dstPortInt, err := strconv.Atoi(dstPort)
+				if err != nil {
+					break
+				}
+				s.msgChan <- Message{Type: DataMsg, SrcIP: net.ParseIP(srcIP), SrcPort: srcPortInt, DstIP: net.ParseIP(dstIP), DstPort: dstPortInt, Network: conn.LocalAddr().Network(), Message: scanner.Bytes()}
 			}
 		}()
 	}

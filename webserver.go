@@ -147,9 +147,12 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 				}
 				log.Printf("%#v", cm)
 				//process message
-				ws.ServerMgr.StartServer(&cm.ServerConfig)
-				logChan, err := ws.RegisterLogger(cm.Channel)
+				chanID, err := ws.ServerMgr.StartServer(&cm.ServerConfig)
 				if err != nil {
+					log.Println("Error", err)
+				}
+				logChan := ws.ServerMgr.Register(chanID)
+				if logChan == nil {
 					//channel not found
 					conn.SetWriteDeadline(time.Now().Add(writeWait))
 					if err := conn.WriteMessage(websocket.TextMessage, []byte("NOT FOUND")); err != nil {
@@ -160,8 +163,10 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 					for {
 						select {
 						case m := <-logChan:
+							log.Println(m.Message)
 							conn.SetWriteDeadline(time.Now().Add(writeWait))
-							if err := conn.WriteMessage(websocket.TextMessage, m.Message); err != nil {
+							jsonMsg, _ := m.MarshalJSON()
+							if err := conn.WriteMessage(websocket.TextMessage, jsonMsg); err != nil {
 								return
 							}
 						}

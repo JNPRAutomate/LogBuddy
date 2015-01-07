@@ -20,6 +20,11 @@ func (m *Message) String() string {
 	return fmt.Sprintf("Type=\"%d\" SrcIP=\"%s\" SrcPort=\"%d\" DstIP=\"%s\" DstPort=\"%d\" Network=\"%s\" Message=\"%s\"", m.Type, m.SrcIP.String(), m.SrcPort, m.DstIP.String(), m.DstPort, m.Network, string(m.Message))
 }
 
+func (m *Message) MarshalJSON() ([]byte, error) {
+	//check for nil values
+	return []byte(fmt.Sprintf("{\"type\":%d,\"message\":\"%s\",\"srcip\":\"%s\",\"srcport\":%d,\"dstip\":\"%s\",\"dstport\":%d,\"network\":\"%s\"}", m.Type, string(m.Message), m.SrcIP.String(), m.SrcPort, m.DstIP.String(), m.DstPort, m.Network)), nil
+}
+
 //ClientMessage Messages sent from the websocket client
 type ClientMessage struct {
 	Type         int          `json:"type"`         //Type message type

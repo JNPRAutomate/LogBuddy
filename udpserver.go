@@ -4,9 +4,8 @@ import (
 	"bytes"
 	"log"
 	"net"
+	"strconv"
 )
-
-var UDPTestPort = 5000
 
 //UDPServer A server to listen for UDP messages
 type UDPServer struct {
@@ -62,7 +61,23 @@ func (s *UDPServer) Listen() error {
 			return err
 		}
 		go func() {
-			s.msgChan <- Message{Type: DataMsg, Message: bytes.Trim(buffer, "\x00")}
+			srcIP, srcPort, err := net.SplitHostPort(s.sock.LocalAddr().String())
+			if err != nil {
+
+			}
+			//dstIP, dstPort, err := net.SplitHostPort(s.sock.RemoteAddr().String())
+			if err != nil {
+
+			}
+			srcPortInt, err := strconv.Atoi(srcPort)
+			if err != nil {
+
+			}
+			//dstPortInt, err := strconv.Atoi(dstPort)
+			if err != nil {
+
+			}
+			s.msgChan <- Message{Type: DataMsg, SrcIP: net.ParseIP(srcIP), SrcPort: srcPortInt, DstIP: nil /*net.ParseIP(dstIP)*/, DstPort: 0 /*dstPortInt*/, Network: s.sock.LocalAddr().Network(), Message: bytes.Trim(buffer, "\x00")}
 		}()
 	}
 }

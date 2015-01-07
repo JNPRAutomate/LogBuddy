@@ -1,6 +1,7 @@
 package logbuddy
 
 import (
+	"log"
 	"math/rand"
 	"time"
 )
@@ -26,6 +27,7 @@ func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 	//Get a new unused ID
 	id = s.getID()
 
+	//CHECK FOR LISTENING PORT
 	if config.Type == "tcp4" || config.Type == "tcp6" || config.Type == "tcp" {
 		msgChan := make(chan Message)
 		ctrlChan := make(chan CtrlChanMsg)
@@ -33,6 +35,7 @@ func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 		s.CtrlChans[id] = ctrlChan
 		s.MsgChans[id] = msgChan
 		s.ServerConfigs[id] = config
+		log.Println("CHAN", s.MsgChans[id])
 		listener.setListener()
 		go listener.Listen()
 	} else if config.Type == "udp4" || config.Type == "udp6" || config.Type == "udp" {
