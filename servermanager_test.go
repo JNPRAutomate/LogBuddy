@@ -56,8 +56,7 @@ func TestServerManager(t *testing.T) {
 	}
 }
 
-func BenchmarkServerManager(b *testing.B) {
-	ServerManagerItter := 50000
+func BenchmarkServerManagerTCP(b *testing.B) {
 	ServerManagerTestPort := 5001
 
 	counter := 0
@@ -71,38 +70,10 @@ func BenchmarkServerManager(b *testing.B) {
 		b.Fail()
 	}
 	time.Sleep(1 * time.Second)
-
-	//start udp server
-	udpServerID, err := sm.StartServer(&ServerConfig{IP: "0.0.0.0", Port: ServerManagerTestPort, Type: "udp4"})
-	b.Logf("%s %d", "Starting UDP Server ID", udpServerID)
-	if err != nil {
-		b.Logf("%s", err)
-		b.Fail()
-	}
-	time.Sleep(1 * time.Second)
-
+	b.ResetTimer()
 	//send messages to each server
-	for {
-		counter = counter + 1
-		SendTCPMessage("127.0.0.1", ServerManagerTestPort, "tcp4", ServerManagerItter, counter, nil)
-		if counter == ServerManagerItter {
-			b.Logf("%s %d", "Stopping TCP Server ID", tcpServerID)
-			sm.StopServer(tcpServerID)
-			time.Sleep(5 * time.Second)
-			break
-		}
-	}
-
-	//reset counter
-	counter = 0
-	for {
-		counter = counter + 1
-		SendUDPMessage("127.0.0.1", ServerManagerTestPort, "udp4", ServerManagerItter, counter, nil)
-		if counter == ServerManagerItter {
-			b.Logf("%s %d", "Stopping UDP Server ID", udpServerID)
-			sm.StopServer(udpServerID)
-			time.Sleep(5 * time.Second)
-			break
-		}
-	}
+	SendTCPMessageBench("127.0.0.1", ServerManagerTestPort, "tcp4", b.N, counter, b)
+	b.Logf("%s %d", "Stopping TCP Server ID", tcpServerID)
+	b.Log("Packets Sent:", counter)
+	sm.StopServer(tcpServerID)
 }

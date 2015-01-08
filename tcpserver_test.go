@@ -44,7 +44,7 @@ func TestBasicTCPListener(t *testing.T) {
 	}
 }
 
-func SendTCPMessage(dstIP string, dstPort int, netType string, itter int, counter int, t *testing.T) {
+func SendTCPMessageBench(dstIP string, dstPort int, netType string, itter int, counter int, t *testing.B) {
 	t.Logf("%s %d", "Starting TCP connection:", counter)
 	testConn, err := net.DialTCP(netType, nil, &net.TCPAddr{IP: net.ParseIP(dstIP), Port: dstPort})
 	if err != nil {
@@ -53,6 +53,27 @@ func SendTCPMessage(dstIP string, dstPort int, netType string, itter int, counte
 	} else {
 		var i int
 		for i = 0; i < 10; i++ {
+			msg := "Hello " + strconv.Itoa(counter) + "\n"
+			_, err := testConn.Write([]byte(msg))
+			if err != nil {
+				t.Logf("%s %s", "TCP Write Error: ", err)
+				t.Fail()
+			}
+		}
+	}
+	t.Logf("%s %d", "Stopping TCP connection:", counter)
+	testConn.Close()
+}
+
+func SendTCPMessage(dstIP string, dstPort int, netType string, itter int, counter int, t *testing.T) {
+	t.Logf("%s %d", "Starting TCP connection:", counter)
+	testConn, err := net.DialTCP(netType, nil, &net.TCPAddr{IP: net.ParseIP(dstIP), Port: dstPort})
+	if err != nil {
+		t.Logf("%s %s", "TCP Client Error: ", err)
+		t.Fail()
+	} else {
+		var i int
+		for i = 0; i < itter; i++ {
 			msg := "Hello " + strconv.Itoa(counter) + "\n"
 			_, err := testConn.Write([]byte(msg))
 			if err != nil {

@@ -44,6 +44,21 @@ func TestBasicUDPListener(t *testing.T) {
 	}
 }
 
+func SendUDPMessageBench(dstIP string, dstPort int, netType string, itter int, counter int, t *testing.B) {
+	t.Logf("%s %d", "Starting UDP connection:", counter)
+	testConn, _ := net.DialUDP(netType, nil, &net.UDPAddr{IP: net.ParseIP(dstIP), Port: dstPort})
+	var i int
+	for i = 0; i < itter; i++ {
+		_, err := testConn.Write([]byte("Hello " + strconv.Itoa(counter)))
+		if err != nil {
+			t.Logf("%s %s", "UDP Write Error: ", err)
+			t.Fail()
+		}
+	}
+	t.Logf("%s %d", "Stopping UDP connection:", counter)
+	testConn.Close()
+}
+
 func SendUDPMessage(dstIP string, dstPort int, netType string, itter int, counter int, t *testing.T) {
 	t.Logf("%s %d", "Starting UDP connection:", counter)
 	testConn, _ := net.DialUDP(netType, nil, &net.UDPAddr{IP: net.ParseIP(dstIP), Port: dstPort})
