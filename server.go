@@ -2,7 +2,7 @@ package logbuddy
 
 //Server interface defining the behaviors of a server
 type Server interface {
-	Listen() error
+	Listen()
 	close()
 	setListener() error
 }

@@ -2,6 +2,7 @@
 var INIT_MSG = 0;
 var DATA_MSG = 1;
 var REQ_MSG = 2;
+var ERR_MSG = 3;
 var START_MSG = 100;
 var ACK_START_MSG = 101;
 var STOP_MSG = 255;
@@ -30,22 +31,31 @@ var NewServer = function(type, dstip, dstport) {
 
 var ServerConn = function(){
 	this.conn = new WebSocket("ws://" + document.location.host + "/logs");
-	//handle open
-	this.conn.onopen = function(evt) {
-		document.getElementById("logData").textContent = 'Connection Open';
-	}
 	//handle close
 	this.conn.onclose = function(evt) {
-		document.getElementById("logData").textContent = 'Connection Closed';
+		document.getElementById("logData").innerHTML = 'Connection Closed';
 	}
 	//handle messages
 	this.conn.onmessage = function(evt) {
+		console.log(evt.data)
 		msg = JSON.parse(evt.data);
-		if (msg.Type === DATA_MSG) {
-			document.getElementById("logData").textContent = msg.message;
-		} else if (msg.Type === ACK_START_MSG) {
+		if (msg.type === DATA_MSG) {
+			console.log(msg.message)
+			document.getElementById("logData").innerHTML = msg.message;
+		} else if (msg.type === ACK_START_MSG) {
 			//register started server
+			document.getElementById("logData").innerHTML = msg.message;
+		} else if (msg.type === ERR_MSG) {
+			document.getElementById("logData").innerHTML = msg.message;
 		}
+	}
+	//handle errors
+	this.conn.onerror = function(evt) {
+		document.getElementById("logData").innerHTML = evt.data;
+	}
+	//handle open
+	this.conn.onopen = function(evt) {
+		document.getElementById("logData").innerHTML = 'Connection Open';
 	}
 }
 

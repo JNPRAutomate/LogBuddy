@@ -2,8 +2,8 @@ package logbuddy
 
 import (
 	"bufio"
+	"fmt"
 	"io"
-	"log"
 	"net"
 	"strconv"
 	"time"
@@ -15,20 +15,21 @@ type TCPServer struct {
 	listenAddr *net.TCPAddr
 	ctrlChan   chan CtrlChanMsg
 	msgChan    chan Message
+	errChan    chan error
 	sock       *net.TCPListener
 	conns      []*net.TCPConn
 }
 
 //NewTCPServer Creates a new initialized TCPServer
-func NewTCPServer(ctrlChan chan CtrlChanMsg, msgChan chan Message, config *ServerConfig) *TCPServer {
-	s := &TCPServer{ctrlChan: ctrlChan, msgChan: msgChan, Config: config}
+func NewTCPServer(errChan chan error, ctrlChan chan CtrlChanMsg, msgChan chan Message, config *ServerConfig) *TCPServer {
+	s := &TCPServer{errChan: errChan, ctrlChan: ctrlChan, msgChan: msgChan, Config: config}
 	s.setListener()
 	return s
 }
 
 //Listen Starts TCPServer ready to receive messages
 // Typically run as a go routine
-func (s *TCPServer) Listen() error {
+func (s *TCPServer) Listen() {
 	var err error
 
 	go func() {
@@ -36,9 +37,8 @@ func (s *TCPServer) Listen() error {
 			select {
 			case msg := <-s.ctrlChan:
 				if msg.Type == StopMsg {
-					log.Println("Stopping TCP Server")
 					s.close()
-					return
+					s.errChan <- nil
 				}
 			}
 		}
@@ -46,20 +46,23 @@ func (s *TCPServer) Listen() error {
 
 	s.sock, err = net.ListenTCP(s.Config.Type, s.listenAddr)
 	if err != nil {
-		return err
+		s.errChan <- err
+		return
 	}
+	s.msgChan <- Message{Type: AckStartMsg, Message: []byte(fmt.Sprintf("Server started: %s %s %d", s.Config.Type, s.Config.IP, s.Config.Port))}
 	for {
 		conn, err := s.sock.AcceptTCP()
 		if err != nil {
 			switch err := err.(type) {
 			case net.Error:
 				if err.Timeout() {
-					log.Println("Timeout Error")
+					s.errChan <- err
 				} else if err.Temporary() {
-					log.Println("Temp Error")
+					s.errChan <- err
 				}
 			}
-			return err
+			s.errChan <- err
+			return
 		}
 		conn.SetReadBuffer(MaxReadBuffer)
 		s.conns = append(s.conns, conn)

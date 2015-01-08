@@ -2,7 +2,9 @@ package logbuddy
 
 import (
 	"fmt"
+	"html"
 	"net"
+	"strings"
 )
 
 //Message struct used to pass logging information
@@ -22,7 +24,8 @@ func (m *Message) String() string {
 
 func (m *Message) MarshalJSON() ([]byte, error) {
 	//check for nil values
-	return []byte(fmt.Sprintf("{\"type\":%d,\"message\":\"%s\",\"srcip\":\"%s\",\"srcport\":%d,\"dstip\":\"%s\",\"dstport\":%d,\"network\":\"%s\"}", m.Type, string(m.Message), m.SrcIP.String(), m.SrcPort, m.DstIP.String(), m.DstPort, m.Network)), nil
+	message := html.EscapeString(strings.TrimRight(string(m.Message), "\n"))
+	return []byte(fmt.Sprintf("{\"type\":%d,\"message\":\"%s\",\"srcip\":\"%s\",\"srcport\":%d,\"dstip\":\"%s\",\"dstport\":%d,\"network\":\"%s\"}", m.Type, message, m.SrcIP.String(), m.SrcPort, m.DstIP.String(), m.DstPort, m.Network)), nil
 }
 
 //ClientMessage Messages sent from the websocket client

@@ -2,7 +2,7 @@ package logbuddy
 
 import (
 	"bytes"
-	"log"
+	"fmt"
 	"net"
 	"strconv"
 )
@@ -12,19 +12,20 @@ type UDPServer struct {
 	Config     *ServerConfig
 	listenAddr *net.UDPAddr
 	ctrlChan   chan CtrlChanMsg
+	errChan    chan error
 	msgChan    chan Message
 	sock       *net.UDPConn
 }
 
 //NewUDPServer creates a new initialized UDP server
-func NewUDPServer(ctrlChan chan CtrlChanMsg, msgChan chan Message, config *ServerConfig) *UDPServer {
-	s := &UDPServer{ctrlChan: ctrlChan, msgChan: msgChan, listenAddr: nil, Config: config}
+func NewUDPServer(errChan chan error, ctrlChan chan CtrlChanMsg, msgChan chan Message, config *ServerConfig) *UDPServer {
+	s := &UDPServer{errChan: errChan, ctrlChan: ctrlChan, msgChan: msgChan, listenAddr: nil, Config: config}
 	s.setListener()
 	return s
 }
 
 //Listen Listen to
-func (s *UDPServer) Listen() error {
+func (s *UDPServer) Listen() {
 	var err error
 	buffer := make([]byte, 9600)
 
@@ -33,19 +34,20 @@ func (s *UDPServer) Listen() error {
 			select {
 			case msg := <-s.ctrlChan:
 				if msg.Type == StopMsg {
-					log.Println("Stopping UDP Server")
 					s.close()
-					return
+					s.errChan <- nil
 				}
 			}
 		}
 	}()
 
 	s.sock, err = net.ListenUDP(s.Config.Type, s.listenAddr)
-	s.sock.SetReadBuffer(MaxReadBuffer)
 	if err != nil {
-		return err
+		s.errChan <- err
+		return
 	}
+	s.sock.SetReadBuffer(MaxReadBuffer)
+	s.msgChan <- Message{Type: AckStartMsg, Message: []byte(fmt.Sprintf("Server started: %s %s %d", s.Config.Type, s.Config.IP, s.Config.Port))}
 	for {
 		//handle each packet in a seperate go routine
 		_, _, err := s.sock.ReadFromUDP(buffer)
@@ -53,12 +55,13 @@ func (s *UDPServer) Listen() error {
 			switch err := err.(type) {
 			case net.Error:
 				if err.Timeout() {
-					log.Println("Timeout Error")
+					s.errChan <- err
 				} else if err.Temporary() {
-					log.Println("Temp Error")
+					s.errChan <- err
 				}
 			}
-			return err
+			s.errChan <- err
+			return
 		}
 		go func() {
 			srcIP, srcPort, err := net.SplitHostPort(s.sock.LocalAddr().String())

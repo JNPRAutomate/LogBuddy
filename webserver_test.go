@@ -1,17 +1,18 @@
 package logbuddy
 
 import (
-	"github.com/gorilla/websocket"
 	"io/ioutil"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
 func TestBasicWebServer(t *testing.T) {
 	testServer := "localhost:8080"
 	ws := &WebServer{Address: testServer}
-	ws.Listen()
+	go ws.Listen()
 	defer ws.Close()
 	time.Sleep(1 * time.Second)
 	res, err := http.Get("http://localhost:8080/")

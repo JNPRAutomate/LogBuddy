@@ -1,7 +1,6 @@
 package logbuddy
 
 import (
-	"log"
 	"math/rand"
 	"time"
 )
@@ -11,6 +10,7 @@ type ServerManager struct {
 	ServerConfigs map[int]*ServerConfig
 	CtrlChans     map[int]chan CtrlChanMsg
 	MsgChans      map[int]chan Message
+	ErrChans      map[int]chan error
 	msgRouter     *MsgRouter
 }
 
@@ -19,6 +19,7 @@ func NewServerManager() *ServerManager {
 	return &ServerManager{CtrlChans: make(map[int]chan CtrlChanMsg),
 		MsgChans:      make(map[int]chan Message),
 		msgRouter:     &MsgRouter{},
+		ErrChans:      make(map[int]chan error),
 		ServerConfigs: make(map[int]*ServerConfig)}
 }
 
@@ -29,22 +30,21 @@ func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 
 	//CHECK FOR LISTENING PORT
 	if config.Type == "tcp4" || config.Type == "tcp6" || config.Type == "tcp" {
-		msgChan := make(chan Message)
-		ctrlChan := make(chan CtrlChanMsg)
-		listener := &TCPServer{Config: config, msgChan: msgChan, ctrlChan: ctrlChan}
-		s.CtrlChans[id] = ctrlChan
-		s.MsgChans[id] = msgChan
+		s.MsgChans[id] = make(chan Message)
+		s.CtrlChans[id] = make(chan CtrlChanMsg)
+		s.ErrChans[id] = make(chan error)
+		listener := &TCPServer{Config: config, msgChan: s.MsgChans[id], ctrlChan: s.CtrlChans[id], errChan: s.ErrChans[id]}
 		s.ServerConfigs[id] = config
-		log.Println("CHAN", s.MsgChans[id])
+		go s.handleErrors(id)
 		listener.setListener()
 		go listener.Listen()
 	} else if config.Type == "udp4" || config.Type == "udp6" || config.Type == "udp" {
-		msgChan := make(chan Message)
-		ctrlChan := make(chan CtrlChanMsg)
-		s.CtrlChans[id] = ctrlChan
-		s.MsgChans[id] = msgChan
+		s.MsgChans[id] = make(chan Message)
+		s.CtrlChans[id] = make(chan CtrlChanMsg)
+		s.ErrChans[id] = make(chan error)
 		s.ServerConfigs[id] = config
-		listener := &UDPServer{Config: config, ctrlChan: ctrlChan, msgChan: msgChan}
+		listener := &UDPServer{Config: config, msgChan: s.MsgChans[id], ctrlChan: s.CtrlChans[id], errChan: s.ErrChans[id]}
+		go s.handleErrors(id)
 		listener.setListener()
 		go listener.Listen()
 	} else {
@@ -52,6 +52,17 @@ func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 		return id, err
 	}
 	return id, err
+}
+
+func (s *ServerManager) handleErrors(id int) {
+	for {
+		select {
+		case msg := <-s.ErrChans[id]:
+			if msg != nil {
+				s.MsgChans[id] <- Message{Type: ErrMsg, Message: []byte(msg.Error())}
+			}
+		}
+	}
 }
 
 //Register Returns the message channel of an associated server

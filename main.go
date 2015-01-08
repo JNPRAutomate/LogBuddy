@@ -12,6 +12,8 @@ const (
 	DataMsg = 1
 	//ReqMsg New request message
 	ReqMsg = 2
+	//ErrMsg Error message
+	ErrMsg = 3
 	//StartMsg Start message
 	StartMsg = 100
 	//AckStartMsg acknowledge start message

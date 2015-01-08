@@ -2,13 +2,14 @@ package logbuddy
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
 	"log"
 	"net"
 	"net/http"
 	"text/template"
 	"time"
+
+	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 )
 
 var (
@@ -145,7 +146,6 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 						return
 					}
 				}
-				log.Printf("%#v", cm)
 				//process message
 				chanID, err := ws.ServerMgr.StartServer(&cm.ServerConfig)
 				if err != nil {
@@ -163,7 +163,6 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 					for {
 						select {
 						case m := <-logChan:
-							log.Println(m.Message)
 							conn.SetWriteDeadline(time.Now().Add(writeWait))
 							jsonMsg, _ := m.MarshalJSON()
 							if err := conn.WriteMessage(websocket.TextMessage, jsonMsg); err != nil {
