@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strings"
 	"text/template"
 	"time"
 
@@ -36,8 +37,7 @@ func (ws *WebServer) Listen() error {
 	ws.ServerMgr = NewServerManager()
 	r.HandleFunc("/", ws.homeHandler).Methods("GET")
 	r.HandleFunc("/logs", ws.wsServeLogs)
-	//r.HandleFunc("/js/d3.js", jsD3Handler).Methods("GET")
-	//r.HandleFunc("/js/jquery.js", jsJQueryHandler).Methods("GET")
+	r.HandleFunc("/static/{file:[a-zA-Z/.]+}", ws.ServeStatic).Methods("GET")
 	addr, err := net.ResolveTCPAddr("tcp", ws.Address)
 	if err != nil {
 		return err
@@ -198,6 +198,17 @@ func (ws *WebServer) wsError(w http.ResponseWriter, r *http.Request, status int,
 //RegisterLogger Registers a logger to be sent to the connection
 func (ws *WebServer) RegisterLogger(id int) (msgChan chan Message, err error) {
 	return nil, nil
+}
+
+func (ws *WebServer) ServeStatic(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	fileName := vars["file"]
+	data, err := Asset(strings.Join([]string{"static/", fileName}, ""))
+	if err != nil {
+		// Asset was not found.
+		http.NotFound(w, r)
+	}
+	w.Write(data)
 }
 
 const homeHTML = `<!DOCTYPE html>
