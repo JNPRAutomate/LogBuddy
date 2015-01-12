@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"path"
 	"strings"
 	"text/template"
 	"time"
@@ -35,7 +36,7 @@ func (ws *WebServer) Listen() error {
 	var err error
 	r := mux.NewRouter()
 	ws.ServerMgr = NewServerManager()
-	r.HandleFunc("/", ws.homeHandler).Methods("GET")
+	r.HandleFunc("/", ws.HomeHandler).Methods("GET")
 	r.HandleFunc("/logs", ws.wsServeLogs)
 	r.HandleFunc("/static/{file:[a-zA-Z/.]+}", ws.ServeStatic).Methods("GET")
 	addr, err := net.ResolveTCPAddr("tcp", ws.Address)
@@ -207,6 +208,13 @@ func (ws *WebServer) ServeStatic(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// Asset was not found.
 		http.NotFound(w, r)
+	}
+	_, file := path.Split(fileName)
+	fType := strings.Split(file, ".")
+	if fType[1] == "js" || fType[2] == "js" {
+		w.Header().Set("Content-Type", "text/javascript")
+	} else if fType[1] == "css" || fType[2] == "css" {
+		w.Header().Set("Content-Type", "text/css")
 	}
 	w.Write(data)
 }
