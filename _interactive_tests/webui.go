@@ -1,5 +1,7 @@
 package main
 
+//go:generate go-bindata -pkg "logbuddy" -o ../logbuddy_bindata.go ../static/...
+
 import "github.com/jnprautomate/logbuddy"
 
 func main() {

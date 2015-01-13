@@ -1,17 +1,23 @@
 {{define "body"}}
 <div id="body-wrapper">
+	<!-- sidebar -->
 	<div id="sidebar">
 		<ul class="sidebar-nav">
+			<li class="sidebar-header">LogBuddy</li>
 			<li>Home</li>
 			<li>Servers</li>
+			<li><div id="status-icon" class="conn-status-disconn"><h3><span class="glyphicon glyphicon-flash" aria-hidden="true"></span></h3></div></li>
 		</ul>
 	</div>
-	<div id="log-panel" class="panel panel-default">
-		<div class="panel-heading">
-			<h3 class="panel-title">Logs</h3>
-		</div>
-		<div id="logs" class="panel-body">
+	<!-- main -->
+	<div id="main-wrapper">
+		<div id="log-panel" class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Logs</h3>
+			</div>
+			<div id="logs" class="panel-body">
 
+			</div>
 		</div>
 	</div>
 </div>

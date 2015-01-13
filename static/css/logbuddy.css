@@ -1,25 +1,41 @@
 .log-panel {
-    width: 60%;
-    height: 60%;
+    width: 90%;
+    height: 75%;
+}
+.sidebar-header {
+    font-size: 20px;
+    padding-bottom: 12px;
 }
 #sidebar {
     width: 250px;
     z-index: 1000;
     left: 250px;
-    height: 100%;
     margin-left: -250px;
     overflow-y: auto;
 }
 .sidebar-nav {
-    position: absolute;
+    position: fixed;
     top: 0;
     width: 250px;
+    height: 100%;
     margin: 0;
     padding: 0;
     list-style: none;
     background: #000000;
     color: rgb(151, 151, 151);
+    padding-left: 25px;
+    padding-top: 45px;
 }
 #body-wrapper {
     padding-left: 250px;
+}
+#main-wrapper {
+    position: relative;
+    padding: 20px;
+}
+.conn-status-disconn {
+    color: red;
+}
+.conn-status-conn {
+    color: #00ff1d;
 }

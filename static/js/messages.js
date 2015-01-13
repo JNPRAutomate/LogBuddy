@@ -33,20 +33,21 @@ var ServerConn = function(){
 	this.conn = new WebSocket("ws://" + document.location.host + "/logs");
 	//handle close
 	this.conn.onclose = function(evt) {
-		document.getElementById("logData").innerHTML = 'Connection Closed';
+		$("#status-icon").addClass("conn-status-disconn");
+		$("#status-icon").removeClass("conn-status-conn");
 	}
 	//handle messages
 	this.conn.onmessage = function(evt) {
 		console.log(evt.data)
 		msg = JSON.parse(evt.data);
 		if (msg.type === DATA_MSG) {
-			console.log(msg.message)
-			document.getElementById("logData").innerHTML = msg.message;
+			$("#logs").append($("<p>", {html: msg.message}));
+			console.log(msg.message);
 		} else if (msg.type === ACK_START_MSG) {
 			//register started server
-			document.getElementById("logData").innerHTML = msg.message;
+			console.log(msg.message);
 		} else if (msg.type === ERR_MSG) {
-			document.getElementById("logData").innerHTML = msg.message;
+			console.log(msg.message);
 		}
 	}
 	//handle errors
@@ -55,7 +56,8 @@ var ServerConn = function(){
 	}
 	//handle open
 	this.conn.onopen = function(evt) {
-		document.getElementById("logData").innerHTML = 'Connection Open';
+		$("#status-icon").removeClass("conn-status-disconn");
+		$("#status-icon").addClass("conn-status-conn");
 	}
 }
 
@@ -72,4 +74,14 @@ ServerConn.prototype.StopServer = function(channel) {
 //Requests an existing server
 ServerConn.prototype.ReqChannel = function(channel) {
 	this.conn.send(NewClientMsg(REQ_MSG,channel));
+}
+
+//Checks to see if the server is listneing
+ServerConn.prototype.CheckConn = function() {
+	var self = this;
+	if (self.conn.readyState === 1) {
+		return true;
+	} else {
+		return false;
+	}
 }

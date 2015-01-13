@@ -38,7 +38,7 @@ func (ws *WebServer) Listen() error {
 	ws.ServerMgr = NewServerManager()
 	r.HandleFunc("/", ws.HomeHandler).Methods("GET")
 	r.HandleFunc("/logs", ws.wsServeLogs)
-	r.HandleFunc("/static/{file:[a-zA-Z/.]+}", ws.ServeStatic).Methods("GET")
+	r.HandleFunc("/static/{file:[a-zA-Z/.-]+}", ws.ServeStatic).Methods("GET")
 	addr, err := net.ResolveTCPAddr("tcp", ws.Address)
 	if err != nil {
 		return err
