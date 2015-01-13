@@ -201,6 +201,7 @@ func (ws *WebServer) RegisterLogger(id int) (msgChan chan Message, err error) {
 	return nil, nil
 }
 
+//ServeStatic Serves static content
 func (ws *WebServer) ServeStatic(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	fileName := vars["file"]
@@ -211,10 +212,19 @@ func (ws *WebServer) ServeStatic(w http.ResponseWriter, r *http.Request) {
 	}
 	_, file := path.Split(fileName)
 	fType := strings.Split(file, ".")
-	if fType[1] == "js" || fType[2] == "js" {
-		w.Header().Set("Content-Type", "text/javascript")
-	} else if fType[1] == "css" || fType[2] == "css" {
-		w.Header().Set("Content-Type", "text/css")
+	if len(fType) == 2 {
+		if fType[1] == "js" {
+			w.Header().Set("Content-Type", "text/javascript")
+		} else if fType[1] == "css" {
+			w.Header().Set("Content-Type", "text/css")
+		}
+	}
+	if len(fType) == 3 {
+		if fType[2] == "js" {
+			w.Header().Set("Content-Type", "text/javascript")
+		} else if fType[2] == "css" {
+			w.Header().Set("Content-Type", "text/css")
+		}
 	}
 	w.Write(data)
 }

@@ -76,7 +76,7 @@ func static_css_bootstrap_theme_css() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/css/bootstrap-theme.css", size: 22474, mode: os.FileMode(420), modTime: time.Unix(1421036285, 0)}
+	info := bindata_file_info{name: "static/css/bootstrap-theme.css", size: 22474, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -96,7 +96,7 @@ func static_css_bootstrap_theme_css_map() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/css/bootstrap-theme.css.map", size: 43029, mode: os.FileMode(420), modTime: time.Unix(1421036285, 0)}
+	info := bindata_file_info{name: "static/css/bootstrap-theme.css.map", size: 43029, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -116,7 +116,7 @@ func static_css_bootstrap_theme_min_css() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/css/bootstrap-theme.min.css", size: 19835, mode: os.FileMode(420), modTime: time.Unix(1421036285, 0)}
+	info := bindata_file_info{name: "static/css/bootstrap-theme.min.css", size: 19835, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -136,7 +136,7 @@ func static_css_bootstrap_css() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/css/bootstrap.css", size: 137067, mode: os.FileMode(420), modTime: time.Unix(1421036285, 0)}
+	info := bindata_file_info{name: "static/css/bootstrap.css", size: 137067, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -156,7 +156,7 @@ func static_css_bootstrap_css_map() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/css/bootstrap.css.map", size: 366144, mode: os.FileMode(420), modTime: time.Unix(1421036285, 0)}
+	info := bindata_file_info{name: "static/css/bootstrap.css.map", size: 366144, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -176,7 +176,27 @@ func static_css_bootstrap_min_css() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/css/bootstrap.min.css", size: 113498, mode: os.FileMode(420), modTime: time.Unix(1421036285, 0)}
+	info := bindata_file_info{name: "static/css/bootstrap.min.css", size: 113498, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
+	a := &asset{bytes: bytes, info:  info}
+	return a, nil
+}
+
+var _static_css_logbuddy_css = []byte("\x1f\x8b\x08\x00\x00\x09\x6e\x88\x00\xff\x64\x90\xd1\x6e\xc3\x20\x0c\x45\xdf\xf3\x15\x96\xaa\x49\x9b\x34\x22\x3a\x69\x7d\x60\x5f\x03\x85\x12\x34\x66\x23\x70\x9a\x66\x53\xff\x7d\x59\xa0\xd5\xa2\x5a\xbc\xd8\x1c\xfb\x5e\xdd\x3e\x92\x17\x49\xa3\x8b\xf0\xd3\xc1\x52\x53\xb0\x3c\x28\x38\xc8\xa7\x8f\xb5\x1f\x5c\xf0\x03\xb7\xc1\xb5\xdb\x95\x60\x9d\xd1\x79\x4b\xbf\xbd\xcb\x74\xa9\xfc\xb7\x08\x68\xdd\x45\xc1\x5e\x4a\x59\x47\xd1\x9d\x78\xc3\xdc\x6e\x2e\x48\x53\xf9\xd2\xd9\x07\x14\x95\x14\xff\x50\x3a\xbb\x7c\x8a\x34\x89\x59\x81\x1e\x99\xfe\x3c\xf4\xcd\x83\x40\x7d\x6e\x3e\x12\x95\xc0\x81\x70\x81\x4c\xa1\x38\xb2\xab\xeb\x4c\x49\x41\xb3\xf1\xe8\xb5\xaa\xde\x81\xa4\xad\x0d\xe8\xef\x7d\x0c\x85\x45\xe1\x39\x3a\x05\x48\xd8\x4e\x1a\x7d\xfc\xf4\x99\x46\xb4\x0a\x76\x72\xad\xfa\x71\xa4\x48\x59\x41\xf6\x46\x3f\xcb\x57\x68\xaf\x3f\xec\x5f\xd6\xe0\x0c\xd9\x59\x4c\x59\xa7\xe4\x6e\xe9\x35\x41\xb1\x09\xe8\xda\xfd\x06\x00\x00\xff\xff\xb1\x55\xf1\xd6\x94\x01\x00\x00")
+
+func static_css_logbuddy_css_bytes() ([]byte, error) {
+	return bindata_read(
+		_static_css_logbuddy_css,
+		"static/css/logbuddy.css",
+	)
+}
+
+func static_css_logbuddy_css() (*asset, error) {
+	bytes, err := static_css_logbuddy_css_bytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindata_file_info{name: "static/css/logbuddy.css", size: 404, mode: os.FileMode(420), modTime: time.Unix(1421116741, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -196,7 +216,7 @@ func static_fonts_glyphicons_halflings_regular_eot() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/fonts/glyphicons-halflings-regular.eot", size: 20335, mode: os.FileMode(420), modTime: time.Unix(1421036306, 0)}
+	info := bindata_file_info{name: "static/fonts/glyphicons-halflings-regular.eot", size: 20335, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -216,7 +236,7 @@ func static_fonts_glyphicons_halflings_regular_svg() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/fonts/glyphicons-halflings-regular.svg", size: 62926, mode: os.FileMode(420), modTime: time.Unix(1421036306, 0)}
+	info := bindata_file_info{name: "static/fonts/glyphicons-halflings-regular.svg", size: 62926, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -236,7 +256,7 @@ func static_fonts_glyphicons_halflings_regular_ttf() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/fonts/glyphicons-halflings-regular.ttf", size: 41280, mode: os.FileMode(420), modTime: time.Unix(1421036306, 0)}
+	info := bindata_file_info{name: "static/fonts/glyphicons-halflings-regular.ttf", size: 41280, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -256,7 +276,7 @@ func static_fonts_glyphicons_halflings_regular_woff() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/fonts/glyphicons-halflings-regular.woff", size: 23320, mode: os.FileMode(420), modTime: time.Unix(1421036306, 0)}
+	info := bindata_file_info{name: "static/fonts/glyphicons-halflings-regular.woff", size: 23320, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -276,7 +296,7 @@ func static_js_bootstrap_js() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/js/bootstrap.js", size: 67155, mode: os.FileMode(420), modTime: time.Unix(1421036296, 0)}
+	info := bindata_file_info{name: "static/js/bootstrap.js", size: 67155, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -296,7 +316,7 @@ func static_js_bootstrap_min_js() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/js/bootstrap.min.js", size: 35601, mode: os.FileMode(420), modTime: time.Unix(1421036296, 0)}
+	info := bindata_file_info{name: "static/js/bootstrap.min.js", size: 35601, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -316,7 +336,7 @@ func static_js_messages_js() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/js/messages.js", size: 2020, mode: os.FileMode(436), modTime: time.Unix(1420702737, 0)}
+	info := bindata_file_info{name: "static/js/messages.js", size: 2020, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -336,7 +356,7 @@ func static_js_npm_js() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/js/npm.js", size: 484, mode: os.FileMode(420), modTime: time.Unix(1421036296, 0)}
+	info := bindata_file_info{name: "static/js/npm.js", size: 484, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -356,12 +376,12 @@ func static_tmpl_footer_tmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/tmpl/footer.tmpl", size: 249, mode: os.FileMode(436), modTime: time.Unix(1421037119, 0)}
+	info := bindata_file_info{name: "static/tmpl/footer.tmpl", size: 249, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
 
-var _static_tmpl_header_tmpl = []byte("\x1f\x8b\x08\x00\x00\x09\x6e\x88\x00\xff\x24\x8d\xc1\x0d\xc3\x20\x10\x04\xdf\xa1\x0a\x44\x01\xa6\x01\xc2\x23\xef\x34\x81\x7d\xeb\x80\x82\x21\x82\xcb\x03\x21\xf7\x9e\x8b\xfc\x3a\xdd\xec\x6a\x76\x4e\xc2\x9e\x0a\xb4\x89\x08\x84\x66\xce\x53\xb9\xc8\x47\xf6\x72\x84\x78\x75\x73\x9c\x38\xc3\x3f\xeb\xeb\xf1\x25\x1a\xce\x5e\xbf\x04\x39\x95\xb7\x8e\x0d\xfb\xdd\x74\x0e\x9c\x36\xbb\xf5\x6e\xd7\x5a\xb9\x73\x0b\x9f\xe5\x48\x65\x11\x62\x74\x43\xfe\x57\x46\x46\x8f\x00\x1b\x91\xdb\xcb\xee\xd6\x4a\xc3\xab\x39\x51\x48\xa6\x7f\x01\x00\x00\xff\xff\x92\xc0\x59\x20\x8f\x00\x00\x00")
+var _static_tmpl_header_tmpl = []byte("\x1f\x8b\x08\x00\x00\x09\x6e\x88\x00\xff\x74\x8e\x31\x0e\xc3\x20\x0c\x45\xe7\xe6\x14\x11\x07\x08\x17\xa0\x0c\x9d\x7b\x89\x10\xff\x04\x54\x07\x2a\x70\x07\x84\x72\xf7\x12\x65\xce\x64\xf9\xdb\x4f\xff\xb5\x46\x58\x43\xc4\xa8\x3c\x66\x42\x56\xc7\x31\x18\x2f\x3b\xdb\x3e\x7a\x62\x87\x87\x91\x20\x0c\xfb\x4e\xdb\xeb\x47\x54\x8d\xbe\xf6\x7e\xe0\x10\x3f\xa3\xcf\x58\x9f\xaa\xc8\x2c\x61\xd1\x4b\x29\xda\xa5\x24\x45\xf2\xfc\x9d\xf6\x10\xa7\x9e\xa8\x31\x83\xcf\x97\xca\x28\x1e\x10\x75\x0f\x73\xda\xdc\xd9\x72\xc7\x19\x7d\x59\x19\x97\xa8\xda\xa1\x35\x44\xea\xca\xff\x00\x00\x00\xff\xff\x63\x3a\x14\x6a\xc7\x00\x00\x00")
 
 func static_tmpl_header_tmpl_bytes() ([]byte, error) {
 	return bindata_read(
@@ -376,12 +396,12 @@ func static_tmpl_header_tmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/tmpl/header.tmpl", size: 143, mode: os.FileMode(436), modTime: time.Unix(1421036866, 0)}
+	info := bindata_file_info{name: "static/tmpl/header.tmpl", size: 199, mode: os.FileMode(420), modTime: time.Unix(1421114677, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
 
-var _static_tmpl_home_tmpl = []byte("\x1f\x8b\x08\x00\x00\x09\x6e\x88\x00\xff\xaa\xae\x4e\x49\x4d\xcb\xcc\x4b\x55\x50\x4a\xca\x4f\xa9\x54\xaa\xad\xe5\xe2\xb2\xc9\x30\xb4\x73\x02\x72\x6c\xf4\x81\x0c\x2e\xae\xea\xea\xd4\xbc\x14\xa0\x38\x20\x00\x00\xff\xff\x0b\x1c\xc0\x03\x2a\x00\x00\x00")
+var _static_tmpl_home_tmpl = []byte("\x1f\x8b\x08\x00\x00\x09\x6e\x88\x00\xff\x54\x90\xbf\x0e\x83\x20\x10\xc6\x67\x7d\x0a\xc2\x4e\x1c\x5c\x29\x73\x87\x6e\x7d\x02\x2c\x57\xbd\xe4\x0a\x06\xd4\xa6\x21\xbe\x7b\x11\xff\x44\x17\x0e\xbe\x3b\xbe\xef\x97\x8b\xd1\xc0\x1b\x2d\x30\xde\x38\xf3\xe3\xf3\x5c\x4a\x83\x13\x43\x73\xcb\x82\xf8\x7a\xdd\xf7\xe0\xb9\x2a\x8b\xa3\x11\xd0\x40\xa3\xb3\x56\xc8\x91\xd8\x8b\x74\x08\x87\x2c\xac\x9e\x72\xab\x90\x84\xea\xee\x3e\x20\xab\x74\xd9\x85\x27\xf8\x09\x7c\xd8\x35\x59\x8d\xb4\x78\x57\xc9\xfc\x9c\x41\xae\x15\xbd\xb6\x40\x7c\xb7\xcf\x2f\x96\x4f\x91\x98\xf5\x48\xc3\x4a\xb0\x7c\x39\xcf\x88\x0e\xb4\x41\xdb\x6e\x10\x5d\x7d\xed\x0e\x38\x10\x70\xf5\x70\x6d\x82\xe8\xea\x15\x62\x4d\xbf\xc4\x87\x6b\xb2\xc8\xfb\x51\xe5\x69\x7c\xab\x5b\x89\x11\xac\x49\xfb\xfb\x07\x00\x00\xff\xff\xf7\x66\x50\x9a\x52\x01\x00\x00")
 
 func static_tmpl_home_tmpl_bytes() ([]byte, error) {
 	return bindata_read(
@@ -396,7 +416,7 @@ func static_tmpl_home_tmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/tmpl/home.tmpl", size: 42, mode: os.FileMode(436), modTime: time.Unix(1421036953, 0)}
+	info := bindata_file_info{name: "static/tmpl/home.tmpl", size: 338, mode: os.FileMode(420), modTime: time.Unix(1421116526, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -448,6 +468,7 @@ var _bindata = map[string]func() (*asset, error){
 	"static/css/bootstrap.css": static_css_bootstrap_css,
 	"static/css/bootstrap.css.map": static_css_bootstrap_css_map,
 	"static/css/bootstrap.min.css": static_css_bootstrap_min_css,
+	"static/css/logbuddy.css": static_css_logbuddy_css,
 	"static/fonts/glyphicons-halflings-regular.eot": static_fonts_glyphicons_halflings_regular_eot,
 	"static/fonts/glyphicons-halflings-regular.svg": static_fonts_glyphicons_halflings_regular_svg,
 	"static/fonts/glyphicons-halflings-regular.ttf": static_fonts_glyphicons_halflings_regular_ttf,
@@ -514,6 +535,8 @@ var _bintree = &_bintree_t{nil, map[string]*_bintree_t{
 			"bootstrap.css.map": &_bintree_t{static_css_bootstrap_css_map, map[string]*_bintree_t{
 			}},
 			"bootstrap.min.css": &_bintree_t{static_css_bootstrap_min_css, map[string]*_bintree_t{
+			}},
+			"logbuddy.css": &_bintree_t{static_css_logbuddy_css, map[string]*_bintree_t{
 			}},
 		}},
 		"fonts": &_bintree_t{nil, map[string]*_bintree_t{
