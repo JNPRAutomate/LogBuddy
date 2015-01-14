@@ -6,6 +6,9 @@
     font-size: 20px;
     padding-bottom: 12px;
 }
+#logs {
+    overflow-y: scroll;
+}
 #sidebar {
     width: 250px;
     z-index: 1000;

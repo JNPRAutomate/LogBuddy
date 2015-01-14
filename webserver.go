@@ -79,10 +79,6 @@ func (ws *WebServer) homeHandler(w http.ResponseWriter, r *http.Request) {
 	home.Execute(w, &homeData)
 }
 
-func (ws *WebServer) staticHandler(w http.ResponseWriter, r *http.Request) {
-
-}
-
 func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:   1024,
@@ -90,6 +86,12 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 		HandshakeTimeout: 2 * time.Second,
 		CheckOrigin:      ws.wsOriginChecker,
 		Error:            ws.wsError}
+	//
+	//
+	// NEED TO IMPLEMENT COOKIES.
+	// THIS WILL BIND THE USER SESSION TO ALL THEIR WEBSOCKETS AND PORTS THAT ARE OPEN.
+	//
+	//
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
