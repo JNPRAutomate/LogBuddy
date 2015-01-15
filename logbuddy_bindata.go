@@ -76,7 +76,7 @@ func static_css_bootstrap_theme_css() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/css/bootstrap-theme.css", size: 22474, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
+	info := bindata_file_info{name: "static/css/bootstrap-theme.css", size: 22474, mode: os.FileMode(420), modTime: time.Unix(1421036285, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -96,7 +96,7 @@ func static_css_bootstrap_theme_css_map() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/css/bootstrap-theme.css.map", size: 43029, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
+	info := bindata_file_info{name: "static/css/bootstrap-theme.css.map", size: 43029, mode: os.FileMode(420), modTime: time.Unix(1421036285, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -116,7 +116,7 @@ func static_css_bootstrap_theme_min_css() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/css/bootstrap-theme.min.css", size: 19835, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
+	info := bindata_file_info{name: "static/css/bootstrap-theme.min.css", size: 19835, mode: os.FileMode(420), modTime: time.Unix(1421036285, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -136,7 +136,7 @@ func static_css_bootstrap_css() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/css/bootstrap.css", size: 137067, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
+	info := bindata_file_info{name: "static/css/bootstrap.css", size: 137067, mode: os.FileMode(420), modTime: time.Unix(1421036285, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -156,7 +156,7 @@ func static_css_bootstrap_css_map() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/css/bootstrap.css.map", size: 366144, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
+	info := bindata_file_info{name: "static/css/bootstrap.css.map", size: 366144, mode: os.FileMode(420), modTime: time.Unix(1421036285, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -176,7 +176,7 @@ func static_css_bootstrap_min_css() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/css/bootstrap.min.css", size: 113498, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
+	info := bindata_file_info{name: "static/css/bootstrap.min.css", size: 113498, mode: os.FileMode(420), modTime: time.Unix(1421036285, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -196,7 +196,7 @@ func static_css_logbuddy_css() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/css/logbuddy.css", size: 692, mode: os.FileMode(420), modTime: time.Unix(1421212490, 0)}
+	info := bindata_file_info{name: "static/css/logbuddy.css", size: 692, mode: os.FileMode(436), modTime: time.Unix(1421309154, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -216,7 +216,7 @@ func static_fonts_glyphicons_halflings_regular_eot() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/fonts/glyphicons-halflings-regular.eot", size: 20335, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
+	info := bindata_file_info{name: "static/fonts/glyphicons-halflings-regular.eot", size: 20335, mode: os.FileMode(420), modTime: time.Unix(1421036306, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -236,7 +236,7 @@ func static_fonts_glyphicons_halflings_regular_svg() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/fonts/glyphicons-halflings-regular.svg", size: 62926, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
+	info := bindata_file_info{name: "static/fonts/glyphicons-halflings-regular.svg", size: 62926, mode: os.FileMode(420), modTime: time.Unix(1421036306, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -256,7 +256,7 @@ func static_fonts_glyphicons_halflings_regular_ttf() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/fonts/glyphicons-halflings-regular.ttf", size: 41280, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
+	info := bindata_file_info{name: "static/fonts/glyphicons-halflings-regular.ttf", size: 41280, mode: os.FileMode(420), modTime: time.Unix(1421036306, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -276,7 +276,7 @@ func static_fonts_glyphicons_halflings_regular_woff() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/fonts/glyphicons-halflings-regular.woff", size: 23320, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
+	info := bindata_file_info{name: "static/fonts/glyphicons-halflings-regular.woff", size: 23320, mode: os.FileMode(420), modTime: time.Unix(1421036306, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -296,7 +296,7 @@ func static_js_bootstrap_js() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/js/bootstrap.js", size: 67155, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
+	info := bindata_file_info{name: "static/js/bootstrap.js", size: 67155, mode: os.FileMode(420), modTime: time.Unix(1421036296, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -316,7 +316,7 @@ func static_js_bootstrap_min_js() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/js/bootstrap.min.js", size: 35601, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
+	info := bindata_file_info{name: "static/js/bootstrap.min.js", size: 35601, mode: os.FileMode(420), modTime: time.Unix(1421036296, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -336,7 +336,7 @@ func static_js_messages_js() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/js/messages.js", size: 2206, mode: os.FileMode(420), modTime: time.Unix(1421134173, 0)}
+	info := bindata_file_info{name: "static/js/messages.js", size: 2206, mode: os.FileMode(436), modTime: time.Unix(1421309154, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -356,7 +356,7 @@ func static_js_npm_js() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/js/npm.js", size: 484, mode: os.FileMode(420), modTime: time.Unix(1421090798, 0)}
+	info := bindata_file_info{name: "static/js/npm.js", size: 484, mode: os.FileMode(420), modTime: time.Unix(1421036296, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -376,7 +376,7 @@ func static_tmpl_footer_tmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/tmpl/footer.tmpl", size: 572, mode: os.FileMode(420), modTime: time.Unix(1421212929, 0)}
+	info := bindata_file_info{name: "static/tmpl/footer.tmpl", size: 572, mode: os.FileMode(436), modTime: time.Unix(1421309154, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -396,7 +396,7 @@ func static_tmpl_header_tmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/tmpl/header.tmpl", size: 295, mode: os.FileMode(420), modTime: time.Unix(1421131098, 0)}
+	info := bindata_file_info{name: "static/tmpl/header.tmpl", size: 295, mode: os.FileMode(436), modTime: time.Unix(1421309154, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }
@@ -416,7 +416,7 @@ func static_tmpl_home_tmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindata_file_info{name: "static/tmpl/home.tmpl", size: 598, mode: os.FileMode(420), modTime: time.Unix(1421213072, 0)}
+	info := bindata_file_info{name: "static/tmpl/home.tmpl", size: 598, mode: os.FileMode(436), modTime: time.Unix(1421309154, 0)}
 	a := &asset{bytes: bytes, info:  info}
 	return a, nil
 }

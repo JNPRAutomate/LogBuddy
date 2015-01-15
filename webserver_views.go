@@ -7,6 +7,7 @@ import (
 
 func (ws *WebServer) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	finalTemplate := template.New("home")
+	ws.ClientMgr.StartSession(w)
 
 	headerAsset, _ := Asset("static/tmpl/header.tmpl")
 	footerAsset, _ := Asset("static/tmpl/footer.tmpl")

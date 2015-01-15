@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"path"
 	"strings"
-	"text/template"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -29,6 +28,7 @@ type WebServer struct {
 	Address   string            //Address the address to listen on
 	ServerMgr *ServerManager    //ServerMgr Interaction with the server manager to review jobs
 	wsConns   []*websocket.Conn //Conns all open connection
+	ClientMgr *WebClientMgr     //Client manager manages the state of clients
 }
 
 //Listen set webserver to listen
@@ -36,6 +36,7 @@ func (ws *WebServer) Listen() error {
 	var err error
 	r := mux.NewRouter()
 	ws.ServerMgr = NewServerManager()
+	ws.ClientMgr = NewWebClientMgr()
 	r.HandleFunc("/", ws.HomeHandler).Methods("GET")
 	r.HandleFunc("/logs", ws.wsServeLogs)
 	r.HandleFunc("/static/{file:[a-zA-Z/.-]+}", ws.ServeStatic).Methods("GET")
@@ -66,17 +67,6 @@ func (ws *WebServer) Close() error {
 
 	}
 	return ws.listener.Close()
-}
-
-func (ws *WebServer) homeHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf8")
-	home := template.Must(template.New("").Parse(homeHTML))
-	var homeData = struct {
-		Host string
-	}{
-		r.Host,
-	}
-	home.Execute(w, &homeData)
 }
 
 func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
