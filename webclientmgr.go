@@ -19,6 +19,7 @@ type WebClientMgr struct {
 	sCookie       *securecookie.SecureCookie
 	ServerMgr     *ServerManager //ServerMgr Interaction with the server manager to review jobs
 }
+//TODO: Add in server manager here. It makes the most sense as it is bound to the web client
 
 //StartSession generates a new cookie for clients and adds the session to the WebClientMgr
 func (wcm *WebClientMgr) StartSession(w http.ResponseWriter) {
