@@ -40,7 +40,7 @@ func TestBasicWebSocketServer(t *testing.T) {
 	clientHeader := http.Header{}
 	clientHeader.Add("Origin", "http://localhost:8081")
 	clientHeader.Add("Host", testServer)
-	clientHeader.Add("Sec-WebSocket-Extensions", "permessage-deflate; client_max_window_bits")
+	clientHeader.Add("Sec-WebSocket-Extensions", "perMessage-deflate; client_max_window_bits")
 	cConn, _, err := wsClient.Dial("ws://localhost:8081/logs", clientHeader)
 	if err != nil {
 		t.Fatalf("%s", err.Error())

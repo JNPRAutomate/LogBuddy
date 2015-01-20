@@ -1,8 +1,10 @@
-//Constants for message types
+//Constants for LogMessage types
 var INIT_MSG = 0;
 var DATA_MSG = 1;
 var REQ_MSG = 2;
 var ERR_MSG = 3;
+var CTRL_MSG = 4;
+var RESTART_MSG = 5;
 var START_MSG = 100;
 var ACK_START_MSG = 101;
 var STOP_MSG = 255;
@@ -10,14 +12,13 @@ var STOP_MSG = 255;
 /*
 	JSONinc golang like object structure
 
-	ClientMessage : {
-		Type:
-		Channel:
-		ServerConfig:
+	WSClientLogMessage : {
+		Type: //specifys the type of payload
+		Data: //payload json
 	}
 */
 
-//ClientMessage generates a new clientmessage
+//ClientLogMessage generates a new clientLogMessage
 var NewClientMsg = function(type, channel, serverconfig) {
 	if (channel == null || channel == undefined) {
 		channel = 0
@@ -36,18 +37,22 @@ var ServerConn = function(){
 		$("#status-icon").addClass("conn-status-disconn");
 		$("#status-icon").removeClass("conn-status-conn");
 	}
-	//handle messages
+	//handle LogMessages
 	this.conn.onmessage = function(evt) {
 		console.log(evt.data)
 		msg = JSON.parse(evt.data);
 		if (msg.type === DATA_MSG) {
 			$("#logs").append($("<p>", {html: msg.message}));
-			console.log(msg.message);
+			console.log(msg.LogMessage);
 		} else if (msg.type === ACK_START_MSG) {
+			$("#server-list").append("<li data-id=\""+msg.data.id+"\">IP:"+msg.data.ip+" Port:"+msg.data.port+" Type: "+msg.data.type+"</li>");
 			//register started server
 			console.log(msg.message);
 		} else if (msg.type === ERR_MSG) {
+			//remove server if error thrown
 			console.log(msg.message);
+		} else if (msg.type === RESTART_MSG) {
+			$("#server-list").append("<li data-id=\""+msg.data.id+"\">IP:"+msg.data.ip+" Port:"+msg.data.port+" Type: "+msg.data.type+"</li>");
 		}
 	}
 	//handle errors

@@ -30,7 +30,7 @@ func TestServerManager(t *testing.T) {
 	}
 	time.Sleep(1 * time.Second)
 
-	//send messages to each server
+	//send Messages to each server
 	for {
 		counter = counter + 1
 		SendTCPMessage("127.0.0.1", ServerManagerTestPort, "tcp4", ServerManagerItter, counter, t)
@@ -71,7 +71,7 @@ func BenchmarkServerManagerTCP(b *testing.B) {
 	}
 	time.Sleep(1 * time.Second)
 	b.ResetTimer()
-	//send messages to each server
+	//send Messages to each server
 	SendTCPMessageBench("127.0.0.1", ServerManagerTestPort, "tcp4", b.N, counter, b)
 	b.Logf("%s %d", "Stopping TCP Server ID", tcpServerID)
 	b.Log("Packets Sent:", counter)

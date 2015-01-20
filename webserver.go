@@ -14,9 +14,9 @@ import (
 var (
 	// Time allowed to write the file to the client.
 	writeWait = 15 * time.Second
-	// Max time to wait for the next pong message
+	// Max time to wait for the next pong LogMessage
 	pongKeepAlive = 60 * time.Second
-	// Rate to send ping messages to client
+	// Rate to send ping LogMessages to client
 	pingRate = (pongKeepAlive * 9) / 10
 )
 
@@ -112,7 +112,7 @@ const homeHTML = `<!DOCTYPE html>
 			conn.onclose = function(evt) {
 				data.textContent = 'Connection closed';
 			}
-			conn.onmessage = function(evt) {
+			conn.onLogMessage = function(evt) {
 				console.log(evt);
 				data.textContent = evt.data;
 			}

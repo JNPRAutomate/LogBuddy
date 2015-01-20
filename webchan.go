@@ -6,10 +6,10 @@ import (
 
 type WebChanMsg struct {
 	Type     int    //Msg type
-	Message  []byte //message
-	SrcIP    net.IP //Src IP of message
-	SrcPort  int    //Src Port of message
-	DestIP   net.IP //Dst IP of message
-	DestPort int    //Dest Port of message
-	Network  string //Network type of message
+	LogMessage  []byte //LogMessage
+	SrcIP    net.IP //Src IP of LogMessage
+	SrcPort  int    //Src Port of LogMessage
+	DestIP   net.IP //Dst IP of LogMessage
+	DestPort int    //Dest Port of LogMessage
+	Network  string //Network type of LogMessage
 }

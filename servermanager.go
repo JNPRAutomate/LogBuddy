@@ -1,6 +1,7 @@
 package logbuddy
 
 import (
+	"errors"
 	"math/rand"
 	"time"
 )
@@ -27,7 +28,7 @@ func NewServerManager() *ServerManager {
 func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 	//Get a new unused ID
 	id = s.getID()
-
+	config.ID = id
 	//CHECK FOR LISTENING PORT
 	if config.Type == "tcp4" || config.Type == "tcp6" || config.Type == "tcp" {
 		s.MsgChans[id] = make(chan Message)
@@ -35,9 +36,11 @@ func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 		s.ErrChans[id] = make(chan error)
 		listener := &TCPServer{Config: config, msgChan: s.MsgChans[id], ctrlChan: s.CtrlChans[id], errChan: s.ErrChans[id]}
 		s.ServerConfigs[id] = config
+		go s.handleCtrl(id)
 		go s.handleErrors(id)
 		listener.setListener()
 		go listener.Listen()
+		return id, nil
 	} else if config.Type == "udp4" || config.Type == "udp6" || config.Type == "udp" {
 		s.MsgChans[id] = make(chan Message)
 		s.CtrlChans[id] = make(chan CtrlChanMsg)
@@ -47,11 +50,20 @@ func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 		go s.handleErrors(id)
 		listener.setListener()
 		go listener.Listen()
-	} else {
-		//Unable to create server
-		return id, err
+		return id, nil
 	}
-	return id, err
+	return id, errors.New("Unable to create specified server")
+}
+
+func (s *ServerManager) handleCtrl(id int) {
+	for {
+		select {
+		case msg := <-s.CtrlChans[id]:
+			if msg.Type != BadMsg {
+				//	s.CtrlChans[id] <- Message{Type: ErrMsg, Message: []byte(msg.Error())}
+			}
+		}
+	}
 }
 
 func (s *ServerManager) handleErrors(id int) {
@@ -65,7 +77,7 @@ func (s *ServerManager) handleErrors(id int) {
 	}
 }
 
-//Register Returns the message channel of an associated server
+//Register Returns the LogMessage channel of an associated server
 func (s *ServerManager) Register(id int) chan Message {
 	if _, ok := s.MsgChans[id]; ok {
 		return s.MsgChans[id]

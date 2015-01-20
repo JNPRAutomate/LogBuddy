@@ -24,6 +24,23 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	//check for existing session
+	clientID, logChans := ws.ClientMgr.StartWSSession(w, r, conn)
+
+	for item := range logChans {
+		go func(logChan chan Message) {
+			for {
+				select {
+				case m := <-logChan:
+					conn.SetWriteDeadline(time.Now().Add(writeWait))
+					jsonMsg, _ := m.MarshalJSON()
+					if err := conn.WriteMessage(websocket.TextMessage, jsonMsg); err != nil {
+						return
+					}
+				}
+			}
+		}(logChans[item])
+	}
 	//handle websocket connection
 	ws.wsConns = append(ws.wsConns, conn)
 	conn.SetReadLimit(1024)
@@ -75,7 +92,7 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 					}
 				}
 				//process message
-				logChan := ws.ClientMgr.StartServer("", &cm.ServerConfig)
+				logChan := ws.ClientMgr.StartServer(clientID, &cm.ServerConfig)
 				if logChan == nil {
 					//channel not found
 					conn.SetWriteDeadline(time.Now().Add(writeWait))

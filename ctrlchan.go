@@ -1,5 +1,5 @@
 package logbuddy
 
 type CtrlChanMsg struct {
-	Type int //Message type
+	Type int //LogMessage type
 }
