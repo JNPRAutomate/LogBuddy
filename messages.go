@@ -55,29 +55,6 @@ func (m *LogMessage) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf("{ message\":\"%s\",\"srcip\":\"%s\",\"srcport\":%d,\"dstip\":\"%s\",\"dstport\":%d,\"network\":\"%s\"}", message, m.SrcIP.String(), m.SrcPort, m.DstIP.String(), m.DstPort, m.Network)), nil
 }
 
-//Message struct used to pass logging information
-type Message struct {
-	Type    int    `json:"type"`     //Msg type
-	Message []byte `json:"Message"`  //Message
-	SrcIP   net.IP `json:"srcip"`    //Src IP of Message
-	SrcPort int    `json:"srcport"`  //Src Port of Message
-	DstIP   net.IP `json:"destip"`   //Dst IP of Message
-	DstPort int    `json:"destport"` //Dest Port of Message
-	Network string `json:"network"`  //Network type of Message tcp,tcp4,tcp6,udp,udp4,udp6
-}
-
-//String returns string value of LogMessage
-func (m *Message) String() string {
-	return fmt.Sprintf("Type=\"%d\" SrcIP=\"%s\" SrcPort=\"%d\" DstIP=\"%s\" DstPort=\"%d\" Network=\"%s\" Message=\"%s\"", m.Type, m.SrcIP.String(), m.SrcPort, m.DstIP.String(), m.DstPort, m.Network, string(m.Message))
-}
-
-//MarshalJSON returns json []byte of Message
-func (m *Message) MarshalJSON() ([]byte, error) {
-	//check for nil values
-	message := html.EscapeString(strings.TrimRight(string(m.Message), "\n"))
-	return []byte(fmt.Sprintf("{\"type\":%d, \"message\":\"%s\",\"srcip\":\"%s\",\"srcport\":%d,\"dstip\":\"%s\",\"dstport\":%d,\"network\":\"%s\"}", m.Type, message, m.SrcIP.String(), m.SrcPort, m.DstIP.String(), m.DstPort, m.Network)), nil
-}
-
 //ClientMessage Messages sent from the websocket client
 type ClientMessage struct {
 	Type         int          `json:"type"`         //Type Message type

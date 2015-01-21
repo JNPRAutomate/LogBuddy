@@ -13,12 +13,12 @@ type UDPServer struct {
 	listenAddr *net.UDPAddr
 	ctrlChan   chan CtrlChanMsg
 	errChan    chan error
-	msgChan    chan Message
+	msgChan    chan LogMessage
 	sock       *net.UDPConn
 }
 
 //NewUDPServer creates a new initialized UDP server
-func NewUDPServer(errChan chan error, ctrlChan chan CtrlChanMsg, msgChan chan Message, config *ServerConfig) *UDPServer {
+func NewUDPServer(errChan chan error, ctrlChan chan CtrlChanMsg, msgChan chan LogMessage, config *ServerConfig) *UDPServer {
 	s := &UDPServer{errChan: errChan, ctrlChan: ctrlChan, msgChan: msgChan, listenAddr: nil, Config: config}
 	s.setListener()
 	return s
@@ -47,7 +47,8 @@ func (s *UDPServer) Listen() {
 		return
 	}
 	s.sock.SetReadBuffer(MaxReadBuffer)
-	s.msgChan <- Message{Type: AckStartMsg, Message: []byte(fmt.Sprintf("Server started: %s %s %d", s.Config.Type, s.Config.IP, s.Config.Port))}
+	//TODO: Send ACKStartMsg on control channel
+	s.ctrlChan <- CtrlChanMsg{Type: AckStartMsg, Message: []byte(fmt.Sprintf("Server started: %s %s %d", s.Config.Type, s.Config.IP, s.Config.Port))}
 	for {
 		//handle each packet in a seperate go routine
 		_, _, err := s.sock.ReadFromUDP(buffer)
@@ -80,7 +81,7 @@ func (s *UDPServer) Listen() {
 			if err != nil {
 
 			}
-			s.msgChan <- Message{Type: DataMsg, SrcIP: net.ParseIP(srcIP), SrcPort: srcPortInt, DstIP: nil /*net.ParseIP(dstIP)*/, DstPort: 0 /*dstPortInt*/, Network: s.sock.LocalAddr().Network(), Message: bytes.Trim(buffer, "\x00")}
+			s.msgChan <- LogMessage{SrcIP: net.ParseIP(srcIP), SrcPort: srcPortInt, DstIP: s.listenAddr.IP, DstPort: s.listenAddr.Port, Network: s.sock.LocalAddr().Network(), Message: bytes.Trim(buffer, "\x00")}
 		}()
 	}
 }

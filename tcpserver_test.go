@@ -17,10 +17,10 @@ func TestTCPServerInterface(t *testing.T) {
 func TestBasicTCPListener(t *testing.T) {
 	counter := 0
 
-	msgChan := make(chan Message)
+	msgChan := make(chan LogMessage)
 	ctrlChan := make(chan CtrlChanMsg)
 
-	go func(msgChan chan Message) {
+	go func(msgChan chan LogMessage) {
 		for {
 			select {
 			case msg := <-msgChan:

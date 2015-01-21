@@ -11,7 +11,7 @@ func TestServerManager(t *testing.T) {
 
 	counter := 0
 	//create new server manager
-	sm := &ServerManager{CtrlChans: make(map[int]chan CtrlChanMsg), MsgChans: make(map[int]chan Message), ServerConfigs: make(map[int]*ServerConfig), ErrChans: make(map[int]chan error)}
+	sm := &ServerManager{CtrlChans: make(map[int]chan CtrlChanMsg), MsgChans: make(map[int]chan LogMessage), ServerConfigs: make(map[int]*ServerConfig), ErrChans: make(map[int]chan error)}
 	//start tcp server
 	tcpServerID, err := sm.StartServer(&ServerConfig{IP: "0.0.0.0", Port: ServerManagerTestPort, Type: "tcp4"})
 	t.Logf("%s %d", "Starting TCP Server ID", tcpServerID)
@@ -61,7 +61,7 @@ func BenchmarkServerManagerTCP(b *testing.B) {
 
 	counter := 0
 	//create new server manager
-	sm := &ServerManager{CtrlChans: make(map[int]chan CtrlChanMsg), MsgChans: make(map[int]chan Message), ServerConfigs: make(map[int]*ServerConfig), ErrChans: make(map[int]chan error)}
+	sm := &ServerManager{CtrlChans: make(map[int]chan CtrlChanMsg), MsgChans: make(map[int]chan LogMessage), ServerConfigs: make(map[int]*ServerConfig), ErrChans: make(map[int]chan error)}
 	//start tcp server
 	tcpServerID, err := sm.StartServer(&ServerConfig{IP: "0.0.0.0", Port: ServerManagerTestPort, Type: "tcp4"})
 	b.Logf("%s %d", "Starting TCP Server ID", tcpServerID)

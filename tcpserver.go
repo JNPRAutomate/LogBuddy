@@ -14,14 +14,14 @@ type TCPServer struct {
 	Config     *ServerConfig
 	listenAddr *net.TCPAddr
 	ctrlChan   chan CtrlChanMsg
-	msgChan    chan Message
+	msgChan    chan LogMessage
 	errChan    chan error
 	sock       *net.TCPListener
 	conns      []*net.TCPConn
 }
 
 //NewTCPServer Creates a new initialized TCPServer
-func NewTCPServer(errChan chan error, ctrlChan chan CtrlChanMsg, msgChan chan Message, config *ServerConfig) *TCPServer {
+func NewTCPServer(errChan chan error, ctrlChan chan CtrlChanMsg, msgChan chan LogMessage, config *ServerConfig) *TCPServer {
 	s := &TCPServer{errChan: errChan, ctrlChan: ctrlChan, msgChan: msgChan, Config: config}
 	s.setListener()
 	return s
@@ -49,7 +49,7 @@ func (s *TCPServer) Listen() {
 		s.errChan <- err
 		return
 	}
-	s.msgChan <- Message{Type: AckStartMsg, Message: []byte(fmt.Sprintf("Server started: %s %s %d", s.Config.Type, s.Config.IP, s.Config.Port))}
+	s.ctrlChan <- CtrlChanMsg{Type: AckStartMsg, Message: []byte(fmt.Sprintf("Server started: %s %s %d", s.Config.Type, s.Config.IP, s.Config.Port))}
 	for {
 		conn, err := s.sock.AcceptTCP()
 		if err != nil {
@@ -95,7 +95,7 @@ func (s *TCPServer) Listen() {
 				if err != nil {
 					break
 				}
-				s.msgChan <- Message{Type: DataMsg, SrcIP: net.ParseIP(srcIP), SrcPort: srcPortInt, DstIP: net.ParseIP(dstIP), DstPort: dstPortInt, Network: conn.LocalAddr().Network(), Message: scanner.Bytes()}
+				s.msgChan <- LogMessage{SrcIP: net.ParseIP(srcIP), SrcPort: srcPortInt, DstIP: net.ParseIP(dstIP), DstPort: dstPortInt, Network: conn.LocalAddr().Network(), Message: scanner.Bytes()}
 			}
 		}()
 	}

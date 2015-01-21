@@ -30,7 +30,7 @@ func TestBinFileStorage(t *testing.T) {
 	//Write to file
 	var i int
 	for i = 0; i < 100; i++ {
-		err = fs.Write(Message{Type: DataMsg, Network: "udp4", SrcIP: net.ParseIP("1.1.1.1"), DstIP: net.ParseIP("2.2.2.2"), DstPort: 5000, SrcPort: 5000, Message: []byte("Eat the test")})
+		err = fs.Write(LogMessage{Network: "udp4", SrcIP: net.ParseIP("1.1.1.1"), DstIP: net.ParseIP("2.2.2.2"), DstPort: 5000, SrcPort: 5000, Message: []byte("Eat the test")})
 		if err != nil {
 			t.Fatalf("%s", err)
 		}

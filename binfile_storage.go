@@ -9,9 +9,9 @@ import (
 
 //BinFileStorage Store logs in a binary format
 type BinFileStorage struct {
-	Location *url.URL     //location of the storage file
-	MsgChan  chan Message //Channel to recieve messages from
-	LogFile  *os.File     //File the file being used
+	Location *url.URL        //location of the storage file
+	MsgChan  chan LogMessage //Channel to recieve messages from
+	LogFile  *os.File        //File the file being used
 }
 
 //NewBinFileStorage Create an initialized NewBinFileStorage
@@ -20,7 +20,7 @@ func NewBinFileStorage(loc *url.URL) *BinFileStorage {
 }
 
 //Write Write data to the destination file
-func (s *BinFileStorage) Write(data ...Message) error {
+func (s *BinFileStorage) Write(data ...LogMessage) error {
 	w := bufio.NewWriter(s.LogFile)
 	e := gob.NewEncoder(w)
 	for msg := range data {

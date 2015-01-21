@@ -9,9 +9,9 @@ import (
 
 //FileStorage Allows data to be written to a file
 type FileStorage struct {
-	Location *url.URL     //location of the storage file
-	MsgChan  chan Message //Channel to recieve messages from
-	LogFile  *os.File     //File the file being used
+	Location *url.URL        //location of the storage file
+	MsgChan  chan LogMessage //Channel to recieve messages from
+	LogFile  *os.File        //File the file being used
 }
 
 //NewFileStorage Create an initialized NewFileStorage
@@ -20,7 +20,7 @@ func NewFileStorage(loc *url.URL) *FileStorage {
 }
 
 //Write Write data to the destination file
-func (s *FileStorage) Write(data ...Message) error {
+func (s *FileStorage) Write(data ...LogMessage) error {
 	w := bufio.NewWriter(s.LogFile)
 
 	for msg := range data {

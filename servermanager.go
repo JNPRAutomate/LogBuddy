@@ -2,6 +2,7 @@ package logbuddy
 
 import (
 	"errors"
+	"log"
 	"math/rand"
 	"time"
 )
@@ -10,7 +11,7 @@ import (
 type ServerManager struct {
 	ServerConfigs map[int]*ServerConfig
 	CtrlChans     map[int]chan CtrlChanMsg
-	MsgChans      map[int]chan Message
+	MsgChans      map[int]chan LogMessage
 	ErrChans      map[int]chan error
 	msgRouter     *MsgRouter
 }
@@ -18,7 +19,7 @@ type ServerManager struct {
 //NewServerManager Creates a new server manager with an initalized CtrlChans map
 func NewServerManager() *ServerManager {
 	return &ServerManager{CtrlChans: make(map[int]chan CtrlChanMsg),
-		MsgChans:      make(map[int]chan Message),
+		MsgChans:      make(map[int]chan LogMessage),
 		msgRouter:     &MsgRouter{},
 		ErrChans:      make(map[int]chan error),
 		ServerConfigs: make(map[int]*ServerConfig)}
@@ -31,7 +32,7 @@ func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 	config.ID = id
 	//CHECK FOR LISTENING PORT
 	if config.Type == "tcp4" || config.Type == "tcp6" || config.Type == "tcp" {
-		s.MsgChans[id] = make(chan Message)
+		s.MsgChans[id] = make(chan LogMessage)
 		s.CtrlChans[id] = make(chan CtrlChanMsg)
 		s.ErrChans[id] = make(chan error)
 		listener := &TCPServer{Config: config, msgChan: s.MsgChans[id], ctrlChan: s.CtrlChans[id], errChan: s.ErrChans[id]}
@@ -42,7 +43,7 @@ func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 		go listener.Listen()
 		return id, nil
 	} else if config.Type == "udp4" || config.Type == "udp6" || config.Type == "udp" {
-		s.MsgChans[id] = make(chan Message)
+		s.MsgChans[id] = make(chan LogMessage)
 		s.CtrlChans[id] = make(chan CtrlChanMsg)
 		s.ErrChans[id] = make(chan error)
 		s.ServerConfigs[id] = config
@@ -59,9 +60,9 @@ func (s *ServerManager) handleCtrl(id int) {
 	for {
 		select {
 		case msg := <-s.CtrlChans[id]:
-			if msg.Type != BadMsg {
-				//	s.CtrlChans[id] <- Message{Type: ErrMsg, Message: []byte(msg.Error())}
-			}
+			log.Println(msg)
+			//TODO: Pass to upstream
+			//s.CtrlChans[id] <- CtrlChanMsg{Type: msg.Type, Message: msg.Message}
 		}
 	}
 }
@@ -70,15 +71,15 @@ func (s *ServerManager) handleErrors(id int) {
 	for {
 		select {
 		case msg := <-s.ErrChans[id]:
-			if msg != nil {
-				s.MsgChans[id] <- Message{Type: ErrMsg, Message: []byte(msg.Error())}
-			}
+			log.Println(msg)
+			//send errors back to the control channel
+			//s.CtrlChans[id] <- CtrlChanMsg{Type: ErrMsg, Message: []byte(msg.Error())}
 		}
 	}
 }
 
 //Register Returns the LogMessage channel of an associated server
-func (s *ServerManager) Register(id int) chan Message {
+func (s *ServerManager) Register(id int) chan LogMessage {
 	if _, ok := s.MsgChans[id]; ok {
 		return s.MsgChans[id]
 	}
@@ -90,7 +91,6 @@ func (s *ServerManager) StopServer(id int) error {
 	//stop instance of server based on ID
 	if _, ok := s.CtrlChans[id]; ok {
 		s.CtrlChans[id] <- CtrlChanMsg{Type: StopMsg}
-		close(s.CtrlChans[id])
 	}
 	return nil
 }

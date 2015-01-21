@@ -28,7 +28,7 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 	clientID, logChans := ws.ClientMgr.StartWSSession(w, r, conn)
 
 	for item := range logChans {
-		go func(logChan chan Message) {
+		go func(logChan chan LogMessage) {
 			for {
 				select {
 				case m := <-logChan:
@@ -128,6 +128,7 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 
 //wsOriginChecker Checks the origin request and validates the request
 func (ws *WebServer) wsOriginChecker(r *http.Request) bool {
+	//TODO: Check that origin is of the same page
 	return true
 }
 
@@ -137,6 +138,6 @@ func (ws *WebServer) wsError(w http.ResponseWriter, r *http.Request, status int,
 }
 
 //RegisterLogger Registers a logger to be sent to the connection
-func (ws *WebServer) RegisterLogger(id int) (msgChan chan Message, err error) {
+func (ws *WebServer) RegisterLogger(id int) (msgChan chan LogMessage, err error) {
 	return nil, nil
 }

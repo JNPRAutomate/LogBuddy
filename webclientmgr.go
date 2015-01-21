@@ -42,12 +42,12 @@ func (wcm *WebClientMgr) StartSession(w http.ResponseWriter, r *http.Request) {
 }
 
 //StartWSSession Starts a websocket session with the WebClientMgr allows it to setup existing session information
-func (wcm *WebClientMgr) StartWSSession(w http.ResponseWriter, r *http.Request, conn *websocket.Conn) (string, []chan Message) {
+func (wcm *WebClientMgr) StartWSSession(w http.ResponseWriter, r *http.Request, conn *websocket.Conn) (string, []chan LogMessage) {
 	if wcm.checkSession(r) {
 		//session exists
 		//reconect logging connections
 		if cookie, err := r.Cookie(CookieName); err == nil {
-			var logChans []chan Message
+			var logChans []chan LogMessage
 			if len(wcm.ClientServers[cookie.Value]) > 0 {
 				for item := range wcm.ClientServers[cookie.Value] {
 					wscm := &WSClientMessage{Type: RestartMsg}
@@ -82,7 +82,7 @@ func (wcm *WebClientMgr) checkSession(r *http.Request) bool {
 }
 
 //StartServer starts a new server for a web client
-func (wcm *WebClientMgr) StartServer(client string, config *ServerConfig) chan Message {
+func (wcm *WebClientMgr) StartServer(client string, config *ServerConfig) chan LogMessage {
 	//add server ids to client servers
 	//return id, error
 	chanID, err := wcm.serverMgr.StartServer(config)
@@ -117,7 +117,7 @@ func (wcm *WebClientMgr) StopSession(id string) {
 }
 
 //ReconnectSession Returns an existing Message channel based on chanID
-func (wcm *WebClientMgr) ReconnectSession(chanID int) chan Message {
+func (wcm *WebClientMgr) ReconnectSession(chanID int) chan LogMessage {
 	logChan := wcm.serverMgr.Register(chanID)
 	if logChan == nil {
 		return nil
