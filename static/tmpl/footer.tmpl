@@ -9,7 +9,6 @@ $(function() {
     var startServerIntID = window.setInterval(function(){
         var ready = wsConn.CheckConn();
         if (ready === true) {
-            wsConn.StartServer("udp4","0.0.0.0",5000);
             clearInterval(startServerIntID);
         }
     },3000);
