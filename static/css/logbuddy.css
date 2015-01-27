@@ -1,13 +1,10 @@
-#log-panel {
-    width: 90%;
-    height: 75%;
-}
 .sidebar-header {
-    font-size: 20px;
+    font-size: 32px;
     padding-bottom: 12px;
+    font-weight: bold;
 }
 #logs {
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 #sidebar {
     width: 265px;

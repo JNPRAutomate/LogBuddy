@@ -10,7 +10,14 @@ $(function() {
         var ready = wsConn.CheckConn();
         if (ready === true) {
             $("#newserver-btn").click(function(){
-                wsConn.StartServer("udp4","0.0.0.0",5000);
+                var proto = $("#listen-proto").find(".active").find("input").val();
+                var port = parseInt($("#listen-port").val(),10);
+                if (proto == "" || port == "" || port == 0 || port > 65535) {
+                    alert("no good " + proto + " " + port)
+                } else {
+                    wsConn.StartServer(proto,"0.0.0.0",parseInt(port,10));
+                }
+
             })
             clearInterval(startServerIntID);
         }
