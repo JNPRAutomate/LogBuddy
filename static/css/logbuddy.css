@@ -3,7 +3,7 @@
     padding-bottom: 12px;
     font-weight: bold;
 }
-#logs {
+#log-display {
     overflow-y: auto;
 }
 #sidebar {
