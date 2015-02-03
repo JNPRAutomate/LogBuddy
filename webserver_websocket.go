@@ -79,7 +79,6 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 			//Handle text messages
 			case websocket.TextMessage:
 				//handle json requests
-				log.Println("Text")
 				log.Println(string(data))
 				//handle different message requests here
 				//TODO: Add return minding message based upon cookie
@@ -92,26 +91,46 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 					}
 				}
 				//process message
-				logChan := ws.ClientMgr.StartServer(clientID, &cm.ServerConfig)
-				if logChan == nil {
+				logChan, ctrlChan := ws.ClientMgr.StartServer(clientID, &cm.ServerConfig)
+				if logChan == nil || ctrlChan == nil {
 					//channel not found
 					conn.SetWriteDeadline(time.Now().Add(writeWait))
-					if err := conn.WriteMessage(websocket.TextMessage, []byte("NOT FOUND")); err != nil {
+					if err := conn.WriteMessage(websocket.TextMessage, []byte("{\"message\":\"NOT FOUND\"")); err != nil {
 						return
 					}
 				}
-				go func() {
+
+				//Pass ctrl messages back to client
+				go func(ctrlMsg <-chan CtrlChanMsg) {
+					for m := range ctrlMsg {
+						time.Sleep(time.Millisecond)
+						log.Printf("CTRL CHAN: %#v", m)
+						conn.SetWriteDeadline(time.Now().Add(writeWait))
+						jsonMsg, _ := m.MarshalJSON()
+						clientMsg := &WSClientMessage{Type: m.Type, ID: 0, Data: jsonMsg}
+						jsonClientMsg, _ := clientMsg.MarshalJSON()
+						if err := conn.WriteMessage(websocket.TextMessage, jsonClientMsg); err != nil {
+							return
+						}
+					}
+				}(ctrlChan)
+
+				//Pass log messages back to client
+				go func(logChan chan LogMessage) {
 					for {
 						select {
 						case m := <-logChan:
 							conn.SetWriteDeadline(time.Now().Add(writeWait))
 							jsonMsg, _ := m.MarshalJSON()
-							if err := conn.WriteMessage(websocket.TextMessage, jsonMsg); err != nil {
+							clientMsg := &WSClientMessage{Type: DataMsg, ID: 0, Data: jsonMsg}
+							jsonClientMsg, _ := clientMsg.MarshalJSON()
+							if err := conn.WriteMessage(websocket.TextMessage, jsonClientMsg); err != nil {
 								return
 							}
 						}
 					}
-				}()
+				}(logChan)
+
 			//Handle binary messages
 			case websocket.BinaryMessage:
 				//currently not used

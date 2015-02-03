@@ -28,8 +28,6 @@ type WebClientMgr struct {
 	serverMgr     *ServerManager //serverMgr Interaction with the server manager to review jobs
 }
 
-//TODO: Add in server manager here. It makes the most sense as it is bound to the web client
-
 //StartSession generates a new cookie for clients and adds the session to the WebClientMgr
 func (wcm *WebClientMgr) StartSession(w http.ResponseWriter, r *http.Request) {
 	if wcm.checkSession(r) {
@@ -48,6 +46,7 @@ func (wcm *WebClientMgr) StartWSSession(w http.ResponseWriter, r *http.Request, 
 		//reconect logging connections
 		if cookie, err := r.Cookie(CookieName); err == nil {
 			var logChans []chan LogMessage
+			var ctrlChans []chan CtrlChanMsg
 			if len(wcm.ClientServers[cookie.Value]) > 0 {
 				for item := range wcm.ClientServers[cookie.Value] {
 					wscm := &WSClientMessage{Type: RestartMsg}
@@ -59,7 +58,9 @@ func (wcm *WebClientMgr) StartWSSession(w http.ResponseWriter, r *http.Request, 
 					if err := conn.WriteMessage(websocket.TextMessage, clientMsg); err != nil {
 						return cookie.Value, nil
 					}
-					logChans = append(logChans, wcm.ReconnectSession(wcm.ClientServers[cookie.Value][item]))
+					logChan, ctrlChan := wcm.ReconnectSession(wcm.ClientServers[cookie.Value][item])
+					logChans = append(logChans, logChan)
+					ctrlChans = append(ctrlChans, ctrlChan)
 				}
 			}
 			return cookie.Value, logChans
@@ -82,17 +83,17 @@ func (wcm *WebClientMgr) checkSession(r *http.Request) bool {
 }
 
 //StartServer starts a new server for a web client
-func (wcm *WebClientMgr) StartServer(client string, config *ServerConfig) chan LogMessage {
+func (wcm *WebClientMgr) StartServer(client string, config *ServerConfig) (chan LogMessage, chan CtrlChanMsg) {
 	//add server ids to client servers
 	//return id, error
 	chanID, err := wcm.serverMgr.StartServer(config)
 	if err != nil {
 		log.Println("Error", err)
-		return nil
+		return nil, nil
 	}
 	wcm.bindServer(client, chanID)
-	logChan := wcm.serverMgr.Register(chanID)
-	return logChan
+	logChan, ctrlChan := wcm.serverMgr.Register(chanID)
+	return logChan, ctrlChan
 }
 
 //bindServer Binds a client to a server
@@ -117,18 +118,19 @@ func (wcm *WebClientMgr) StopSession(id string) {
 }
 
 //ReconnectSession Returns an existing Message channel based on chanID
-func (wcm *WebClientMgr) ReconnectSession(chanID int) chan LogMessage {
-	logChan := wcm.serverMgr.Register(chanID)
-	if logChan == nil {
-		return nil
+func (wcm *WebClientMgr) ReconnectSession(chanID int) (chan LogMessage, chan CtrlChanMsg) {
+	logChan, ctrlChan := wcm.serverMgr.Register(chanID)
+	if logChan == nil || ctrlChan == nil {
+		return nil, nil
 	}
-	return logChan
+	return logChan, ctrlChan
 }
 
 //generateCookie generates a new cookie for a client
 func (wcm *WebClientMgr) generateCookie() *http.Cookie {
 	var err error
 	var encoded string
+	//TODO: Make cookies less predictable
 	value := map[string]string{
 		"foo": "bar",
 	}

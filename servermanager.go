@@ -30,14 +30,15 @@ func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 	//Get a new unused ID
 	id = s.getID()
 	config.ID = id
-	//CHECK FOR LISTENING PORT
+	//TODO: CHECK FOR LISTENING PORT
+	//TODO: ADD CLIENT SPECIFIC CTRL CHANNEL
 	if config.Type == "tcp4" || config.Type == "tcp6" || config.Type == "tcp" {
 		s.MsgChans[id] = make(chan LogMessage)
 		s.CtrlChans[id] = make(chan CtrlChanMsg)
 		s.ErrChans[id] = make(chan error)
 		listener := &TCPServer{Config: config, msgChan: s.MsgChans[id], ctrlChan: s.CtrlChans[id], errChan: s.ErrChans[id]}
 		s.ServerConfigs[id] = config
-		go s.handleCtrl(id)
+		s.handleCtrl(id)
 		go s.handleErrors(id)
 		listener.setListener()
 		go listener.Listen()
@@ -48,6 +49,7 @@ func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 		s.ErrChans[id] = make(chan error)
 		s.ServerConfigs[id] = config
 		listener := &UDPServer{Config: config, msgChan: s.MsgChans[id], ctrlChan: s.CtrlChans[id], errChan: s.ErrChans[id]}
+		s.handleCtrl(id)
 		go s.handleErrors(id)
 		listener.setListener()
 		go listener.Listen()
@@ -57,14 +59,14 @@ func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 }
 
 func (s *ServerManager) handleCtrl(id int) {
-	for {
-		select {
-		case msg := <-s.CtrlChans[id]:
-			log.Println(msg)
+	go func(ctrlMsg <-chan CtrlChanMsg) {
+		for msg := range ctrlMsg {
+			time.Sleep(time.Millisecond)
+			log.Println("SM Ctrl", s.CtrlChans[id], msg.String())
 			//TODO: Pass to upstream
 			//s.CtrlChans[id] <- CtrlChanMsg{Type: msg.Type, Message: msg.Message}
 		}
-	}
+	}(s.CtrlChans[id])
 }
 
 func (s *ServerManager) handleErrors(id int) {
@@ -79,11 +81,19 @@ func (s *ServerManager) handleErrors(id int) {
 }
 
 //Register Returns the LogMessage channel of an associated server
-func (s *ServerManager) Register(id int) chan LogMessage {
+func (s *ServerManager) Register(id int) (chan LogMessage, chan CtrlChanMsg) {
+	//TODO: ADD CLIENT SPECIFIC CTRL CHANNEL
+	var msgChan chan LogMessage
+	var ctrlChan chan CtrlChanMsg
+
 	if _, ok := s.MsgChans[id]; ok {
-		return s.MsgChans[id]
+		msgChan = s.MsgChans[id]
 	}
-	return nil
+
+	if _, ok := s.CtrlChans[id]; ok {
+		ctrlChan = s.CtrlChans[id]
+	}
+	return msgChan, ctrlChan
 }
 
 //StopServer Stop a server specified by IP

@@ -1,7 +1,6 @@
 package logbuddy
 
 import (
-	"errors"
 	"fmt"
 	"html"
 	"net"
@@ -52,7 +51,7 @@ func (m *LogMessage) String() string {
 func (m *LogMessage) MarshalJSON() ([]byte, error) {
 	//check for nil values
 	message := html.EscapeString(strings.TrimRight(string(m.Message), "\n"))
-	return []byte(fmt.Sprintf("{ message\":\"%s\",\"srcip\":\"%s\",\"srcport\":%d,\"dstip\":\"%s\",\"dstport\":%d,\"network\":\"%s\"}", message, m.SrcIP.String(), m.SrcPort, m.DstIP.String(), m.DstPort, m.Network)), nil
+	return []byte(fmt.Sprintf("{\"message\":\"%s\",\"srcip\":\"%s\",\"srcport\":%d,\"dstip\":\"%s\",\"dstport\":%d,\"network\":\"%s\"}", message, m.SrcIP.String(), m.SrcPort, m.DstIP.String(), m.DstPort, m.Network)), nil
 }
 
 //ClientMessage Messages sent from the websocket client
@@ -60,25 +59,4 @@ type ClientMessage struct {
 	Type         int          `json:"type"`         //Type Message type
 	Channel      int          `json:"channel"`      // channel to listen on
 	ServerConfig ServerConfig `json:"serverconfig"` //ServerConfig configuration of requested server
-}
-
-//WSClientMessage A universal message to send to web socket clients
-type WSClientMessage struct {
-	Type int    `json:"type"` //Type of Message
-	Data []byte `json:"data"` //Payload of Message
-}
-
-//AddDataPayload adds a []byte payload to Data
-func (wscm *WSClientMessage) AddDataPayload(data []byte) error {
-	if len(data) > 0 {
-		wscm.Data = data
-		return nil
-	}
-	return errors.New("Unable to add payload")
-}
-
-//MarshalJSON returns a JSON version of WSClientMessage
-func (wscm *WSClientMessage) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("{\"type\":%d,\"data\":%s}", wscm.Type, wscm.Data)), nil
-
 }

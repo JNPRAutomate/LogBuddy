@@ -42,8 +42,8 @@ var ServerConn = function(){
 		console.log(evt.data)
 		msg = JSON.parse(evt.data);
 		if (msg.type === DATA_MSG) {
-			$("#logs").append($("<p>", {html: msg.message}));
-			console.log(msg.LogMessage);
+			$("#log-display").append($("<p>", {html: msg.data.message}));
+			console.log(msg.data.message);
 		} else if (msg.type === ACK_START_MSG) {
 			$("#server-list").append("<li data-id=\""+msg.data.id+"\">IP:"+msg.data.ip+" Port:"+msg.data.port+" Type: "+msg.data.type+"</li>");
 			//register started server
