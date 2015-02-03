@@ -103,8 +103,6 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 				//Pass ctrl messages back to client
 				go func(ctrlMsg <-chan CtrlChanMsg) {
 					for m := range ctrlMsg {
-						time.Sleep(time.Millisecond)
-						log.Printf("CTRL CHAN: %#v", m)
 						conn.SetWriteDeadline(time.Now().Add(writeWait))
 						jsonMsg, _ := m.MarshalJSON()
 						clientMsg := &WSClientMessage{Type: m.Type, ID: 0, Data: jsonMsg}

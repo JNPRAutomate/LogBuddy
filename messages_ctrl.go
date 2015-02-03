@@ -15,5 +15,9 @@ func (c *CtrlChanMsg) String() string {
 
 //MarshalJSON returns json []byte of CtrlChanMsg
 func (c *CtrlChanMsg) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("{\"type\":\" %d, \"message\": \"%s\"}", c.Type, string(c.Message))), nil
+	//Check to see if inner message is a JSON message
+	if c.Message[0] == byte('\x7B') {
+		return []byte(fmt.Sprintf("{\"type\": %d, \"message\":%s}", c.Type, string(c.Message))), nil
+	}
+	return []byte(fmt.Sprintf("{\"type\": %d, \"message\":\"%s\"}", c.Type, string(c.Message))), nil
 }

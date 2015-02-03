@@ -43,9 +43,10 @@ var ServerConn = function(){
 		msg = JSON.parse(evt.data);
 		if (msg.type === DATA_MSG) {
 			$("#log-display").append($("<p>", {html: msg.data.message}));
+			$("#log-display").scrollTop($("#log-display").height())
 			console.log(msg.data.message);
 		} else if (msg.type === ACK_START_MSG) {
-			$("#server-list").append("<li data-id=\""+msg.data.id+"\">IP:"+msg.data.ip+" Port:"+msg.data.port+" Type: "+msg.data.type+"</li>");
+			$("#server-list").append("<li data-id=\""+msg.data.message.id+"\">IP:"+msg.data.message.ip+" Port:"+msg.data.message.port+" Type: "+msg.data.message.type+"</li>");
 			//register started server
 			console.log(msg.message);
 		} else if (msg.type === ERR_MSG) {

@@ -11,14 +11,17 @@ import (
 type ServerManager struct {
 	ServerConfigs map[int]*ServerConfig
 	CtrlChans     map[int]chan CtrlChanMsg
-	MsgChans      map[int]chan LogMessage
-	ErrChans      map[int]chan error
-	msgRouter     *MsgRouter
+	//cCtrlChans client provided control chans
+	cCtrlChans map[int]chan CtrlChanMsg
+	MsgChans   map[int]chan LogMessage
+	ErrChans   map[int]chan error
+	msgRouter  *MsgRouter
 }
 
 //NewServerManager Creates a new server manager with an initalized CtrlChans map
 func NewServerManager() *ServerManager {
 	return &ServerManager{CtrlChans: make(map[int]chan CtrlChanMsg),
+		cCtrlChans:    make(map[int]chan CtrlChanMsg),
 		MsgChans:      make(map[int]chan LogMessage),
 		msgRouter:     &MsgRouter{},
 		ErrChans:      make(map[int]chan error),
@@ -35,6 +38,7 @@ func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 	if config.Type == "tcp4" || config.Type == "tcp6" || config.Type == "tcp" {
 		s.MsgChans[id] = make(chan LogMessage)
 		s.CtrlChans[id] = make(chan CtrlChanMsg)
+		s.cCtrlChans[id] = make(chan CtrlChanMsg)
 		s.ErrChans[id] = make(chan error)
 		listener := &TCPServer{Config: config, msgChan: s.MsgChans[id], ctrlChan: s.CtrlChans[id], errChan: s.ErrChans[id]}
 		s.ServerConfigs[id] = config
@@ -46,6 +50,7 @@ func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 	} else if config.Type == "udp4" || config.Type == "udp6" || config.Type == "udp" {
 		s.MsgChans[id] = make(chan LogMessage)
 		s.CtrlChans[id] = make(chan CtrlChanMsg)
+		s.cCtrlChans[id] = make(chan CtrlChanMsg)
 		s.ErrChans[id] = make(chan error)
 		s.ServerConfigs[id] = config
 		listener := &UDPServer{Config: config, msgChan: s.MsgChans[id], ctrlChan: s.CtrlChans[id], errChan: s.ErrChans[id]}
@@ -61,10 +66,11 @@ func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 func (s *ServerManager) handleCtrl(id int) {
 	go func(ctrlMsg <-chan CtrlChanMsg) {
 		for msg := range ctrlMsg {
-			time.Sleep(time.Millisecond)
 			log.Println("SM Ctrl", s.CtrlChans[id], msg.String())
-			//TODO: Pass to upstream
-			//s.CtrlChans[id] <- CtrlChanMsg{Type: msg.Type, Message: msg.Message}
+			if msg.Type == AckStartMsg {
+				msg.Message, _ = s.ServerConfigs[id].MarshalJSON()
+				s.cCtrlChans[id] <- msg
+			}
 		}
 	}(s.CtrlChans[id])
 }
@@ -90,8 +96,8 @@ func (s *ServerManager) Register(id int) (chan LogMessage, chan CtrlChanMsg) {
 		msgChan = s.MsgChans[id]
 	}
 
-	if _, ok := s.CtrlChans[id]; ok {
-		ctrlChan = s.CtrlChans[id]
+	if _, ok := s.cCtrlChans[id]; ok {
+		ctrlChan = s.cCtrlChans[id]
 	}
 	return msgChan, ctrlChan
 }
