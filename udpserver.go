@@ -27,7 +27,6 @@ func NewUDPServer(errChan chan error, ctrlChan chan CtrlChanMsg, msgChan chan Lo
 //Listen Listen to
 func (s *UDPServer) Listen() {
 	var err error
-	buffer := make([]byte, 9600)
 
 	go func() {
 		for {
@@ -51,7 +50,8 @@ func (s *UDPServer) Listen() {
 	s.ctrlChan <- CtrlChanMsg{Type: AckStartMsg, Message: []byte(fmt.Sprintf("Server started: %s %s %d", s.Config.Type, s.Config.IP, s.Config.Port))}
 	for {
 		//handle each packet in a seperate go routine
-		_, _, err := s.sock.ReadFromUDP(buffer)
+		buffer := make([]byte, 9600)
+		_, _, _, _, err := s.sock.ReadMsgUDP(buffer, nil)
 		if err != nil {
 			switch err := err.(type) {
 			case net.Error:
@@ -82,6 +82,7 @@ func (s *UDPServer) Listen() {
 
 			}
 			s.msgChan <- LogMessage{SrcIP: net.ParseIP(srcIP), SrcPort: srcPortInt, DstIP: s.listenAddr.IP, DstPort: s.listenAddr.Port, Network: s.sock.LocalAddr().Network(), Message: bytes.Trim(buffer, "\x00")}
+			buffer = buffer[:cap(buffer)]
 		}()
 	}
 }
