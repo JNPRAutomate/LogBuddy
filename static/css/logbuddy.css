@@ -5,13 +5,13 @@
 }
 #log-display {
     overflow-y: auto;
+    font-size: small;
 }
 #sidebar {
     width: 265px;
     z-index: 1000;
     left: 265px;
     margin-left: -265px;
-    overflow-y: auto;
 }
 .sidebar-nav {
     position: fixed;
