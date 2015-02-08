@@ -6,6 +6,7 @@
 #log-display {
     overflow-y: auto;
     font-size: small;
+    height: 600px;
 }
 #sidebar {
     width: 265px;
