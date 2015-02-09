@@ -3,7 +3,7 @@ package logbuddy
 import (
 	"net"
 	"net/http"
-
+	"sync"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -25,6 +25,7 @@ type WebServer struct {
 	Address   string            //Address the address to listen on
 	wsConns   []*websocket.Conn //Conns all open connection
 	ClientMgr *WebClientMgr     //Client manager manages the state of clients
+	wg        sync.WaitGroup
 }
 
 //Listen set webserver to listen

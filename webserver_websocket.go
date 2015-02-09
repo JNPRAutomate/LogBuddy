@@ -25,10 +25,12 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//check for existing session
-	clientID, logChans := ws.ClientMgr.StartWSSession(w, r, conn)
+	clientID, logChans, ctrlChans := ws.ClientMgr.StartWSSession(w, r, conn)
 
 	for item := range logChans {
 		go func(logChan chan LogMessage) {
+			defer ws.wg.Done()
+			ws.wg.Add(1)
 			for {
 				select {
 				case m := <-logChan:
@@ -41,6 +43,23 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 			}
 		}(logChans[item])
 	}
+
+	for item := range ctrlChans {
+		go func(ctrlMsg <-chan CtrlChanMsg) {
+			defer ws.wg.Done()
+			ws.wg.Add(1)
+			for m := range ctrlMsg {
+				conn.SetWriteDeadline(time.Now().Add(writeWait))
+				jsonMsg, _ := m.MarshalJSON()
+				clientMsg := &WSClientMessage{Type: m.Type, ID: 0, Data: jsonMsg}
+				jsonClientMsg, _ := clientMsg.MarshalJSON()
+				if err := conn.WriteMessage(websocket.TextMessage, jsonClientMsg); err != nil {
+					return
+				}
+			}
+		}(ctrlChans[item])
+	}
+
 	//handle websocket connection
 	ws.wsConns = append(ws.wsConns, conn)
 	conn.SetReadLimit(1024)
@@ -52,6 +71,8 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 	})
 	//Send WebSocket PING messages
 	go func(conn *websocket.Conn) {
+		defer ws.wg.Done()
+		ws.wg.Add(1)
 		pingTicker := time.NewTicker(pingRate)
 		for {
 			select {
@@ -66,6 +87,8 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 	}(conn)
 	//Recieve WebSocket Messages
 	go func(conn *websocket.Conn) {
+		defer ws.wg.Done()
+		ws.wg.Add(1)
 		for {
 			msgType, data, err := conn.ReadMessage()
 			log.Println("MsgType", msgType)
@@ -95,13 +118,15 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 				if logChan == nil || ctrlChan == nil {
 					//channel not found
 					conn.SetWriteDeadline(time.Now().Add(writeWait))
-					if err := conn.WriteMessage(websocket.TextMessage, []byte("{\"message\":\"NOT FOUND\"")); err != nil {
+					if err := conn.WriteMessage(websocket.TextMessage, []byte("{\"type\":ErrMsg,\"message\":\"NOT FOUND\"")); err != nil {
 						return
 					}
 				}
 
 				//Pass ctrl messages back to client
 				go func(ctrlMsg <-chan CtrlChanMsg) {
+					defer ws.wg.Done()
+					ws.wg.Add(1)
 					for m := range ctrlMsg {
 						conn.SetWriteDeadline(time.Now().Add(writeWait))
 						jsonMsg, _ := m.MarshalJSON()
@@ -115,6 +140,9 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 
 				//Pass log messages back to client
 				go func(logChan chan LogMessage) {
+					defer ws.wg.Done()
+					ws.wg.Add(1)
+					//TODO: Close this on client disconnect
 					for {
 						select {
 						case m := <-logChan:
@@ -130,9 +158,9 @@ func (ws *WebServer) wsServeLogs(w http.ResponseWriter, r *http.Request) {
 				}(logChan)
 
 			//Handle binary messages
-			case websocket.BinaryMessage:
-				//currently not used
-				log.Println("Bin")
+			//case websocket.BinaryMessage:
+			//currently not used
+			//log.Println("Bin")
 			//Handle close messages
 			case websocket.CloseMessage:
 				//Closing connection

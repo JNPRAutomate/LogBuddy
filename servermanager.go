@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"math/rand"
+	"sync"
 	"time"
 )
 
@@ -16,6 +17,7 @@ type ServerManager struct {
 	MsgChans   map[int]chan LogMessage
 	ErrChans   map[int]chan error
 	msgRouter  *MsgRouter
+	wg         sync.WaitGroup
 }
 
 //NewServerManager Creates a new server manager with an initalized CtrlChans map
@@ -43,8 +45,9 @@ func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 		listener := &TCPServer{Config: config, msgChan: s.MsgChans[id], ctrlChan: s.CtrlChans[id], errChan: s.ErrChans[id]}
 		s.ServerConfigs[id] = config
 		s.handleCtrl(id)
-		go s.handleErrors(id)
+		s.handleErrors(id)
 		listener.setListener()
+		s.wg.Add(1)
 		go listener.Listen()
 		return id, nil
 	} else if config.Type == "udp4" || config.Type == "udp6" || config.Type == "udp" {
@@ -55,8 +58,9 @@ func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 		s.ServerConfigs[id] = config
 		listener := &UDPServer{Config: config, msgChan: s.MsgChans[id], ctrlChan: s.CtrlChans[id], errChan: s.ErrChans[id]}
 		s.handleCtrl(id)
-		go s.handleErrors(id)
+		s.handleErrors(id)
 		listener.setListener()
+		s.wg.Add(1)
 		go listener.Listen()
 		return id, nil
 	}
@@ -65,6 +69,8 @@ func (s *ServerManager) StartServer(config *ServerConfig) (id int, err error) {
 
 func (s *ServerManager) handleCtrl(id int) {
 	go func(ctrlMsg <-chan CtrlChanMsg) {
+		defer s.wg.Done()
+		s.wg.Add(1)
 		for msg := range ctrlMsg {
 			log.Println("SM Ctrl", s.CtrlChans[id], msg.String())
 			if msg.Type == AckStartMsg {
@@ -76,14 +82,14 @@ func (s *ServerManager) handleCtrl(id int) {
 }
 
 func (s *ServerManager) handleErrors(id int) {
-	for {
-		select {
-		case msg := <-s.ErrChans[id]:
+	go func(errMsg <-chan error) {
+		defer s.wg.Done()
+		s.wg.Add(1)
+		for msg := range errMsg {
+			//TODO: Identify if server has stopped
 			log.Println(msg)
-			//send errors back to the control channel
-			//s.CtrlChans[id] <- CtrlChanMsg{Type: ErrMsg, Message: []byte(msg.Error())}
 		}
-	}
+	}(s.ErrChans[id])
 }
 
 //Register Returns the LogMessage channel of an associated server
@@ -107,6 +113,7 @@ func (s *ServerManager) StopServer(id int) error {
 	//stop instance of server based on ID
 	if _, ok := s.CtrlChans[id]; ok {
 		s.CtrlChans[id] <- CtrlChanMsg{Type: StopMsg}
+		s.wg.Done()
 	}
 	return nil
 }

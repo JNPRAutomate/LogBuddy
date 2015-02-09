@@ -40,7 +40,7 @@ func (wcm *WebClientMgr) StartSession(w http.ResponseWriter, r *http.Request) {
 }
 
 //StartWSSession Starts a websocket session with the WebClientMgr allows it to setup existing session information
-func (wcm *WebClientMgr) StartWSSession(w http.ResponseWriter, r *http.Request, conn *websocket.Conn) (string, []chan LogMessage) {
+func (wcm *WebClientMgr) StartWSSession(w http.ResponseWriter, r *http.Request, conn *websocket.Conn) (string, []chan LogMessage, []chan CtrlChanMsg) {
 	if wcm.checkSession(r) {
 		//session exists
 		//reconect logging connections
@@ -56,20 +56,20 @@ func (wcm *WebClientMgr) StartWSSession(w http.ResponseWriter, r *http.Request, 
 					conn.SetWriteDeadline(time.Now().Add(writeWait))
 					clientMsg, _ := wscm.MarshalJSON()
 					if err := conn.WriteMessage(websocket.TextMessage, clientMsg); err != nil {
-						return cookie.Value, nil
+						return cookie.Value, nil, nil
 					}
 					logChan, ctrlChan := wcm.ReconnectSession(wcm.ClientServers[cookie.Value][item])
 					logChans = append(logChans, logChan)
 					ctrlChans = append(ctrlChans, ctrlChan)
 				}
 			}
-			return cookie.Value, logChans
+			return cookie.Value, logChans, ctrlChans
 		}
 	}
 	cookie := wcm.generateCookie()
 	wcm.Clients[cookie.Value] = cookie
 	http.SetCookie(w, cookie)
-	return cookie.Value, nil
+	return cookie.Value, nil, nil
 }
 
 //checkSession checks for session exists
